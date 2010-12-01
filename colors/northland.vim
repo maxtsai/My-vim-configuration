@@ -145,5 +145,31 @@ hi fortranLabelNumber guifg=DarkRed
 
 
 
-"hi fortranTodo guifg=Black guibg=#507080
-"hi fortranContinueMark guifg=White guibg=DarkRed
+hi fortranTodo guifg=Black guibg=#507080
+hi fortranContinueMark guifg=White guibg=DarkRed
+
+" Special for XML
+hi link xmlTag          Keyword 
+hi link xmlTagName      Conditional 
+hi link xmlEndTag       Identifier 
+
+
+" Special for HTML
+hi link htmlTag         Keyword 
+hi link htmlTagName     Conditional 
+hi link htmlEndTag      Identifier 
+
+
+" Special for Javascript
+hi link javaScriptNumber      Number 
+
+
+" Special for Python
+"hi  link pythonEscape         Keyword      
+
+
+" Special for CSharp
+hi  link csXmlTag             Keyword      
+
+
+" Special for PHP

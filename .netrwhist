@@ -1,2 +1,11 @@
 let g:netrw_dirhistmax  =10
-let g:netrw_dirhist_cnt =0
+let g:netrw_dirhist_cnt =9
+let g:netrw_dirhist_1='/home/max/Documents/MSI/N0D1/3g_gps/ericsson/gps/mbm/libsupl'
+let g:netrw_dirhist_2='/home/max/Documents/MSI/N0D1/3g_gps/ericsson/gps/mbm/libsupl/src'
+let g:netrw_dirhist_3='/home/max/Documents/MSI/N0D1/3g_gps/ericsson/gps/mbm'
+let g:netrw_dirhist_4='/home/max/Documents/MSI/N0D1/3g_gps/ericsson/gps/mbm/libsupl'
+let g:netrw_dirhist_5='/home/max/Documents/MSI/N0D1/3g_gps/ericsson/gps/mbm/libsupl/src'
+let g:netrw_dirhist_6='/home/max/works/msi/n0d1/tegra/hardware/tegra/hal/ethernet'
+let g:netrw_dirhist_7='/home/max/works/msi/n0b1/git/uboot'
+let g:netrw_dirhist_8='/home/max/works/msi/n0b1/git/uboot/cpu'
+let g:netrw_dirhist_9='/home/max/works/msi/n0d1/tegra/kernel/arch/arm/mach-tegra'

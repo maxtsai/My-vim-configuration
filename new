@@ -1,0 +1,11 @@
+<link href="http://sevenluckyguys.googlepages.com/SyntaxHighlighter.css" rel="stylesheet" type="text/css"/>  
+<script language="javascript" src="http://sevenluckyguys.googlepages.com/shCore.js"></script>  
+<script language="javascript" src="http://sevenluckyguys.googlepages.com/shBrushCpp.js"></script>  
+<script language="javascript" src="http://sevenluckyguys.googlepages.com/shBrushPhp.js"></script>  
+<script language="javascript" src="http://sevenluckyguys.googlepages.com/shBrushJScript.js"></script>  
+<script language="javascript">  
+dp.SyntaxHighlighter.BloggerMode();  
+dp.SyntaxHighlighter.HighlightAll("code");  
+</script>  
+</body>  
+</html>  
