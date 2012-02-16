@@ -50,8 +50,15 @@ set hls
 set nocompatible
 set number
 set hlsearch
+
+"folding
 set foldmethod=syntax
-set foldlevel=100 "don't autofold anything
+set foldlevel=100
+set foldenable
+set foldcolumn=0
+set foldnestmax=3
+set foldexpr=1
+
 set ruler
 set cursorline
 set viminfo+=!
@@ -94,13 +101,54 @@ map ,h :nohl<CR>
 map ,w :set wrap!<CR>
 map ,n :set nu!<CR>
 map ,s :set cursorline!<CR>:set cursorcolumn!<CR>
+map ,r :MRU <CR>
 
 map <F2> :r /home/max/bin/debug_printk.txt<CR>
-map <F3> :lv /<c-r>=expand("<cword>")<cr>/ **/* <cr>:lw <CR>
-map <F5> :VimwikiAll2HTML <CR>
+"map <F3> :lv /<c-r>=expand("<cword>")<cr>/ **/* <cr>:lw <CR>
+map <F3> :syntax on <CR>
+map <F4> :syntax off <CR>
+map <F6> :VimwikiAll2HTML <CR>
 map <F8> <ESC>:Tlist<ENTER>
 map <F9> :BufExplorer <CR>
 map <F12> :qa <CR>
+
+" print debug comment
+let @d=strftime("/* MaxTsai debugs %Y-%m-%d */")
+let @b=strftime("/* MaxTsai bookmarks %Y-%m-%d */")
+let @m=strftime("/* MaxTsai marks %Y-%m-%d */")
+
+"Most recently used
+let MRU_Max_Entries = 200 
+
+"Lookup files plugin
+"let g:LookupFile_PreserveLastPattern = 0        "不保存上次查找的字符串
+"let g:LookupFile_PreservePatternHistory = 1     "保存查找历史
+"let g:LookupFile_AlwaysAcceptFirst = 1          "回车打开第一个匹配项目
+"let g:LookupFile_AllowNewFiles = 0              "不允许创建不存在的文件
+"""" had set g:LookupFile_TagExpr in cscope_map.vim of plugin
+"nmap <silent> ,lk :LUTags<cr> 
+"nmap <silent> ,ll :LUBufs<cr>
+"nmap <silent> ,lw :LUWalk<cr>
+"" lookup file with ignore case
+"function! LookupFile_IgnoreCaseFunc(pattern)
+"    let _tags = &tags
+"    try
+"        let &tags = eval(g:LookupFile_TagExpr)
+"        let newpattern = '\c' . a:pattern
+"        let tags = taglist(newpattern)
+"    catch
+"        echohl ErrorMsg | echo "Exception: " . v:exception | echohl NONE
+"        return ""
+"    finally
+"        let &tags = _tags
+"    endtry
+"
+"    " Show the matches for what is typed so far.
+"    let files = map(tags, 'v:val["filename"]')
+"    return files
+"endfunction
+"let g:LookupFile_LookupFunc = 'LookupFile_IgnoreCaseFunc' 
+
 
 "let Tlist_Inc_Winwidth=0
 let Tlist_Ctags_Cmd="/usr/bin/ctags"
@@ -129,16 +177,17 @@ autocmd BufEnter * :syntax sync fromstart " ensure every file does syntax highli
 " Statusline
 """"""""""""""""""""""""""""""
 " Always hide the statusline
-set laststatus=2
+set laststatus=0
 
 " Format the statusline
-set statusline=[%t]
-set statusline+=\ [%l/%L:%c]\ [%r%{CurDir()}%h]
-set statusline+=\ %<
-function! CurDir()
-    let curdir = substitute(getcwd(), '/home/max/', "~/", "g")
-    return curdir
-endfunction
+"set statusline=[%t]
+"set statusline+=\ [%l/%L:%c]\ [%r%{CurDir()}%h]
+"set statusline+=\ %f
+"set statusline+=\ %<
+"function! CurDir()
+"    let curdir = substitute(getcwd(), '/home/max/', '~/', 'g')
+"    return curdir
+"endfunction
 
 """"""""""""""""""""""""""""""
 " BufExplorer
@@ -160,9 +209,9 @@ func! DeleteTrailingWS()
   %s/\s\+$//ge
   exe "normal `z"
 endfunc
-autocmd BufWrite *.[ch] :call DeleteTrailingWS()
-autocmd BufWrite *.cpp :call DeleteTrailingWS()
-autocmd BufWrite *.java :call DeleteTrailingWS()
+"autocmd BufWrite *.[ch] :call DeleteTrailingWS()
+"autocmd BufWrite *.cpp :call DeleteTrailingWS()
+"autocmd BufWrite *.java :call DeleteTrailingWS()
 
 
 """"""""""""""""""""""""""""""
@@ -173,7 +222,7 @@ let g:vimwiki_valid_html_tags='b,i,s,u,sub,sup,kbd,br,hr,div,del,code,pre'
 let g:vimwiki_camel_case=0
 let g:vimwiki_hl_cb_checked=1
 let g:vimwiki_CJK_length=1
-let g:vimwiki_list = [{'path': '~/vimwiki/', 'path_html': '~/document/myWiki'}]
+let g:vimwiki_list = [{'path': '~/vimwiki/', 'path_html': '~/Documents/myWiki'}]
 " make local commands work (for ex., Vimwiki2HTML)
 set nocompatible
 filetype plugin on
@@ -186,6 +235,7 @@ filetype plugin on
 "nmap <C-n> :cnext<CR>
 "nmap <C-p> :cprev<CR>
 "nmap <C-t> :colder<CR>:cc<CR>
+run plugin/cscope_map.vim
 
 
 """"""""""""""""""""""""""""""

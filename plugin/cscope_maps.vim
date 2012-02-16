@@ -38,6 +38,7 @@ if has("cscope")
     set csto=0
 
     " Search database for each project
+    let cur_path = getcwd()
     let i = 1
     while i < 20
     	if filereadable("cscope.out")
@@ -46,6 +47,9 @@ if has("cscope")
 		let $CSCOPE_DB = db
 		cs add $CSCOPE_DB
 		let i = 20
+		if filereadable("filenametags")
+			let g:LookupFile_TagExpr = "getcwd() . \'/filenametags\'"
+		endif
 	else
 		cd ..
 		let i += 1
@@ -53,7 +57,8 @@ if has("cscope")
     endwhile
 
     if getcwd() == "/"
-    	cd $PWD
+	execute "cd".fnameescape(cur_path)
+	"echo "cd".fnameescape(cur_path)
     endif
 
     " show msg when any other cscope db added
