@@ -50,6 +50,7 @@ set hls
 set nocompatible
 set number
 set hlsearch
+set mouse=a
 
 "folding
 set foldmethod=syntax
@@ -94,8 +95,8 @@ endif
 
 
 highlight Search term=reverse ctermbg=4 ctermfg=7
-" highlight Normal ctermbg=black ctermfg=grey 
-hi Comment ctermfg=darkcyan 
+" highlight Normal ctermbg=black ctermfg=grey
+hi Comment ctermfg=darkcyan
 
 map ,h :nohl<CR>
 map ,w :set wrap!<CR>
@@ -118,36 +119,38 @@ let @b=strftime("/* MaxTsai bookmarks %Y-%m-%d */")
 let @m=strftime("/* MaxTsai marks %Y-%m-%d */")
 
 "Most recently used
-let MRU_Max_Entries = 200 
+let MRU_Max_Entries = 200
 
-"Lookup files plugin
-"let g:LookupFile_PreserveLastPattern = 0        "不保存上次查找的字符串
-"let g:LookupFile_PreservePatternHistory = 1     "保存查找历史
-"let g:LookupFile_AlwaysAcceptFirst = 1          "回车打开第一个匹配项目
-"let g:LookupFile_AllowNewFiles = 0              "不允许创建不存在的文件
-"""" had set g:LookupFile_TagExpr in cscope_map.vim of plugin
-"nmap <silent> ,lk :LUTags<cr> 
-"nmap <silent> ,ll :LUBufs<cr>
-"nmap <silent> ,lw :LUWalk<cr>
-"" lookup file with ignore case
-"function! LookupFile_IgnoreCaseFunc(pattern)
-"    let _tags = &tags
-"    try
-"        let &tags = eval(g:LookupFile_TagExpr)
-"        let newpattern = '\c' . a:pattern
-"        let tags = taglist(newpattern)
-"    catch
-"        echohl ErrorMsg | echo "Exception: " . v:exception | echohl NONE
-"        return ""
-"    finally
-"        let &tags = _tags
-"    endtry
-"
-"    " Show the matches for what is typed so far.
-"    let files = map(tags, 'v:val["filename"]')
-"    return files
-"endfunction
-"let g:LookupFile_LookupFunc = 'LookupFile_IgnoreCaseFunc' 
+""" Lookup files plugin
+let g:LookupFile_MinPatLength = 3
+let g:LookupFile_PreserveLastPattern = 0
+let g:LookupFile_PreservePatternHistory = 1
+let g:LookupFile_AlwaysAcceptFirst = 1
+let g:LookupFile_AllowNewFiles = 0
+let g:LookupFile_SortMethod = ""
+""" had set g:LookupFile_TagExpr in cscope_map.vim of plugin
+nmap <silent> ,lk :LUTags<cr>
+nmap <silent> ,ll :LUBufs<cr>
+nmap <silent> ,lw :LUWalk<cr>
+" lookup file with ignore case
+function! LookupFile_IgnoreCaseFunc(pattern)
+    let _tags = &tags
+    try
+        let &tags = eval(g:LookupFile_TagExpr)
+        let newpattern = '\c' . a:pattern
+        let tags = taglist(newpattern)
+    catch
+        echohl ErrorMsg | echo "Exception: " . v:exception | echohl NONE
+        return ""
+    finally
+        let &tags = _tags
+    endtry
+
+    " Show the matches for what is typed so far.
+    let files = map(tags, 'v:val["filename"]')
+    return files
+endfunction
+let g:LookupFile_LookupFunc = 'LookupFile_IgnoreCaseFunc'
 
 
 "let Tlist_Inc_Winwidth=0
@@ -199,7 +202,7 @@ let g:bufExplorerSplitRight=0        " Split left.
 let g:bufExplorerSplitVertical=1     " Split vertically.
 let g:bufExplorerSplitVertSize = 30  " Split width
 let g:bufExplorerUseCurrentWindow=1  " Open in new window.
-autocmd BufWinEnter \[Buf\ List\] setl nonumber 
+autocmd BufWinEnter \[Buf\ List\] setl nonumber
 
 """"""""""""""""""""""""""""""
 " Delete trailing white space
