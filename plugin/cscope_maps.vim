@@ -47,8 +47,8 @@ if has("cscope")
 		let $CSCOPE_DB = db
 		cs add $CSCOPE_DB
 		let i = 20
-		if filereadable("filenametags")
-			let g:LookupFile_TagExpr = "getcwd() . \'/filenametags\'"
+		if filereadable("cscope.filenametags")
+			let g:LookupFile_TagExpr = "getcwd() . \'/cscope.filenametags\'"
 		endif
 	else
 		cd ..
