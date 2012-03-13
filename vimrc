@@ -50,7 +50,7 @@ set hls
 set nocompatible
 set number
 set hlsearch
-set mouse=a
+"set mouse=a
 
 "folding
 set foldmethod=syntax
@@ -108,7 +108,9 @@ map <F2> :r /home/max/bin/debug_printk.txt<CR>
 "map <F3> :lv /<c-r>=expand("<cword>")<cr>/ **/* <cr>:lw <CR>
 map <F3> :syntax on <CR>
 map <F4> :syntax off <CR>
-map <F6> :VimwikiAll2HTML <CR>
+map <F6> :set laststatus=2 <CR>
+map <F7> :set laststatus=0 <CR>
+map <F11> :VimwikiAll2HTML <CR>
 map <F8> <ESC>:Tlist<ENTER>
 map <F9> :BufExplorer <CR>
 map <F12> :qa <CR>
@@ -183,14 +185,18 @@ autocmd BufEnter * :syntax sync fromstart " ensure every file does syntax highli
 set laststatus=0
 
 " Format the statusline
+set statusline=[%r%{CurDir()}%h/%t]\ [FMT=%{&ff}]\ [TYPE=%Y]\ [%l,%v,%L][%p%%]
+"set statusline=%F%m%r%h%w\ [FORMAT=%{&ff}]\ [TYPE=%Y]\ [POS=%04l,%04v][%p%%]\ [LEN=%L]
+"set statusline=[%r%{CurDir()}%h/%t]
 "set statusline=[%t]
 "set statusline+=\ [%l/%L:%c]\ [%r%{CurDir()}%h]
+"set statusline+=\ [%l/%L:%c]
 "set statusline+=\ %f
 "set statusline+=\ %<
-"function! CurDir()
-"    let curdir = substitute(getcwd(), '/home/max/', '~/', 'g')
-"    return curdir
-"endfunction
+function! CurDir()
+    let curdir = substitute(getcwd(), '/home/max/', '~/', 'g')
+    return curdir
+endfunction
 
 """"""""""""""""""""""""""""""
 " BufExplorer
