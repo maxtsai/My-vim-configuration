@@ -95,7 +95,7 @@ endif
 
 
 highlight Search term=reverse ctermbg=4 ctermfg=7
-" highlight Normal ctermbg=black ctermfg=grey
+"highlight Normal ctermbg=black ctermfg=green
 hi Comment ctermfg=darkcyan
 
 map ,h :nohl<CR>
@@ -104,12 +104,10 @@ map ,n :set nu!<CR>
 map ,s :set cursorline!<CR>:set cursorcolumn!<CR>
 map ,r :MRU <CR>
 
-map <F2> :r /home/max/bin/debug_printk.txt<CR>
+map <F2> :r ~/.vim/max/debug_printk.txt<CR>
+map <F3> :r ~/.vim/max/debug_printf.txt<CR>
 "map <F3> :lv /<c-r>=expand("<cword>")<cr>/ **/* <cr>:lw <CR>
-map <F3> :syntax on <CR>
 map <F4> :syntax off <CR>
-map <F6> :set laststatus=2 <CR>
-map <F7> :set laststatus=0 <CR>
 map <F11> :VimwikiAll2HTML <CR>
 map <F8> <ESC>:Tlist<ENTER>
 map <F9> :BufExplorer <CR>
@@ -185,7 +183,7 @@ autocmd BufEnter * :syntax sync fromstart " ensure every file does syntax highli
 set laststatus=0
 
 " Format the statusline
-set statusline=[%r%{CurDir()}%h/%t]\ [FMT=%{&ff}]\ [TYPE=%Y]\ [%l,%v,%L][%p%%]
+" set statusline=[%F,%m,%r,%h,%w]\ [FMT=%{&ff}]\ [TYPE=%Y]\ [%l,%v,%L][%p%%]
 "set statusline=%F%m%r%h%w\ [FORMAT=%{&ff}]\ [TYPE=%Y]\ [POS=%04l,%04v][%p%%]\ [LEN=%L]
 "set statusline=[%r%{CurDir()}%h/%t]
 "set statusline=[%t]
@@ -254,6 +252,10 @@ set previewheight=17            " set gdb window initial height
 run macros/gdb_mappings.vim
 "set asm=0                       " don't show any assembly stuff|
 
-
+""""""""""""""""""""""""""""""
+"
+"""""""""""""""""""""""""""""
+"nmap ,e :tab sp <C-R>=expand("%:h") . "/" <CR>
+nmap ,e :tab sp 
 
 finish
