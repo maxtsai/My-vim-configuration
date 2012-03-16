@@ -108,6 +108,7 @@ map <F2> :r ~/.vim/max/debug_printk.txt<CR>
 map <F3> :r ~/.vim/max/debug_printf.txt<CR>
 "map <F3> :lv /<c-r>=expand("<cword>")<cr>/ **/* <cr>:lw <CR>
 map <F4> :syntax off <CR>
+map <F6> :SaveSession <CR>
 map <F11> :VimwikiAll2HTML <CR>
 map <F8> <ESC>:Tlist<ENTER>
 map <F9> :BufExplorer <CR>
@@ -252,8 +253,6 @@ set previewheight=17            " set gdb window initial height
 run macros/gdb_mappings.vim
 "set asm=0                       " don't show any assembly stuff|
 
-""""""""""""""""""""""""""""""
-"
 """""""""""""""""""""""""""""
 "nmap ,e :tab sp <C-R>=expand("%:h") . "/" <CR>
 nmap ,e :tab sp 
