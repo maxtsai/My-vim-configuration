@@ -85,6 +85,8 @@ set t_Co=256 " 256 colors
 colorscheme ir_black
 
 filetype on
+au FileType java setl sw=4 sts=4 et
+au FileType cpp setl sw=4 sts=4 et
 
 set fenc=utf-8
 set fencs=utf-8,usc-bom,euc-jp,gb18030,gbk,gb2312,cp936
