@@ -114,6 +114,7 @@ map <F5> :lv /<c-r>=expand("<cword>")<cr>/ **/* <cr>:lw <CR>
 map <F6> :cd %:h <CR>
 map <F4> :syntax off <CR>
 map <F11> :VimwikiAll2HTML <CR>
+map <F7> <ESC>:TagbarToggle<ENTER>
 map <F8> <ESC>:Tlist<ENTER>
 map <F9> :BufExplorer <CR>
 map <F12> :qa <CR>
