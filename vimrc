@@ -84,9 +84,10 @@ hi clear
 set t_Co=256 " 256 colors
 colorscheme ir_black
 
-filetype on
-au FileType java setl sw=4 sts=4 et
-au FileType cpp setl sw=4 sts=4 et
+"filetype on
+"au FileType java setl sw=4 sts=4 et
+"au FileType cpp setl sw=4 sts=4 et
+"au FileType aidl setl sw=4 sts=4 et
 
 set fenc=utf-8
 set fencs=utf-8,usc-bom,euc-jp,gb18030,gbk,gb2312,cp936
@@ -108,9 +109,10 @@ map ,r :MRU <CR>
 
 map <F2> :r ~/.vim/max/debug_printk.txt<CR>
 map <F3> :r ~/.vim/max/debug_printf.txt<CR>
-"map <F3> :lv /<c-r>=expand("<cword>")<cr>/ **/* <cr>:lw <CR>
+map <F5> :lv /<c-r>=expand("<cword>")<cr>/ **/* <cr>:lw <CR>
+"map <F6> :SaveSession <CR>
+map <F6> :cd %:h <CR>
 map <F4> :syntax off <CR>
-map <F6> :SaveSession <CR>
 map <F11> :VimwikiAll2HTML <CR>
 map <F8> <ESC>:Tlist<ENTER>
 map <F9> :BufExplorer <CR>
@@ -235,7 +237,7 @@ let g:vimwiki_CJK_length=1
 let g:vimwiki_list = [{'path': '~/vimwiki/', 'path_html': '~/Documents/myWiki'}]
 " make local commands work (for ex., Vimwiki2HTML)
 set nocompatible
-filetype plugin on
+"filetype plugin on
 
 
 """"""""""""""""""""""""""""""
