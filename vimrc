@@ -127,37 +127,10 @@ let @m=strftime("/* MaxTsai marks %Y-%m-%d */")
 "Most recently used
 let MRU_Max_Entries = 200
 
-""" Lookup files plugin
-let g:LookupFile_MinPatLength = 3
-let g:LookupFile_PreserveLastPattern = 0
-let g:LookupFile_PreservePatternHistory = 1
-let g:LookupFile_AlwaysAcceptFirst = 1
-let g:LookupFile_AllowNewFiles = 0
-let g:LookupFile_SortMethod = ""
-""" had set g:LookupFile_TagExpr in cscope_map.vim of plugin
-nmap <silent> ,lk :LUTags<cr>
-nmap <silent> ,ll :LUBufs<cr>
-nmap <silent> ,lw :LUWalk<cr>
-" lookup file with ignore case
-function! LookupFile_IgnoreCaseFunc(pattern)
-    let _tags = &tags
-    try
-        let &tags = eval(g:LookupFile_TagExpr)
-        let newpattern = '\c' . a:pattern
-        let tags = taglist(newpattern)
-    catch
-        echohl ErrorMsg | echo "Exception: " . v:exception | echohl NONE
-        return ""
-    finally
-        let &tags = _tags
-    endtry
-
-    " Show the matches for what is typed so far.
-    let files = map(tags, 'v:val["filename"]')
-    return files
-endfunction
-let g:LookupFile_LookupFunc = 'LookupFile_IgnoreCaseFunc'
-
+"ctrlp, fuzzy search file
+let g:ctrlp_max_files=0
+let g:ctrlp_custom_ignore='.git$|.repo$'
+let g:ctrlp_max_depth=40
 
 "let Tlist_Inc_Winwidth=0
 let Tlist_Ctags_Cmd="/usr/bin/ctags"
