@@ -159,21 +159,8 @@ autocmd BufEnter * :syntax sync fromstart " ensure every file does syntax highli
 " Statusline
 """"""""""""""""""""""""""""""
 " Always hide the statusline
-set laststatus=0
+set laststatus=2
 
-" Format the statusline
-" set statusline=[%F,%m,%r,%h,%w]\ [FMT=%{&ff}]\ [TYPE=%Y]\ [%l,%v,%L][%p%%]
-"set statusline=%F%m%r%h%w\ [FORMAT=%{&ff}]\ [TYPE=%Y]\ [POS=%04l,%04v][%p%%]\ [LEN=%L]
-"set statusline=[%r%{CurDir()}%h/%t]
-"set statusline=[%t]
-"set statusline+=\ [%l/%L:%c]\ [%r%{CurDir()}%h]
-"set statusline+=\ [%l/%L:%c]
-"set statusline+=\ %f
-"set statusline+=\ %<
-function! CurDir()
-    let curdir = substitute(getcwd(), '/home/max/', '~/', 'g')
-    return curdir
-endfunction
 
 """"""""""""""""""""""""""""""
 " BufExplorer

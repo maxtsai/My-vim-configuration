@@ -303,9 +303,9 @@ function! s:BEIgnoreBuffer(buf)
     return 1
   endif
 
-  if index(s:MRU_Exclude_List, bufname(a:buf)) >= 0
-    return 1
-  end
+  "if index(s:MRU_Exclude_List, bufname(a:buf)) >= 0
+  "  return 1
+  "end
 
   return 0 
 endfunction
@@ -1134,7 +1134,7 @@ let s:originBuffer = 0
 let s:splitMode = ""
 let s:name = '[BufExplorer]'
 let s:refreshBufferList = 1
-let s:MRU_Exclude_List = ["[BufExplorer]","__MRU_Files__"]
+" let s:MRU_Exclude_List = ["[BufExplorer]","__MRU_Files__"]
 "1}}}
 
 " vim:ft=vim foldmethod=marker sw=2
