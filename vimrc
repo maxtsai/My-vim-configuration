@@ -120,9 +120,7 @@ map <F9> :BufExplorer <CR>
 map <F12> :qa <CR>
 
 " print debug comment
-let @d=strftime("/* MaxTsai debugs %Y-%m-%d */")
-let @b=strftime("/* MaxTsai bookmarks %Y-%m-%d */")
-let @m=strftime("/* MaxTsai marks %Y-%m-%d */")
+let @d="printk(\"### \%s:\%d\\n\", __func__, __LINE__);"
 
 "Most recently used
 let MRU_Max_Entries = 200
@@ -159,7 +157,7 @@ autocmd BufEnter * :syntax sync fromstart " ensure every file does syntax highli
 " Statusline
 """"""""""""""""""""""""""""""
 " Always hide the statusline
-set laststatus=2
+set laststatus=0
 
 
 """"""""""""""""""""""""""""""
@@ -221,5 +219,9 @@ run macros/gdb_mappings.vim
 """""""""""""""""""""""""""""
 "nmap ,e :tab sp <C-R>=expand("%:h") . "/" <CR>
 nmap ,e :tab sp 
+
+"speed up when syntax on
+set ttyfast
+set lazyredraw
 
 finish
