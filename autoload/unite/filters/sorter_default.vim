@@ -1,6 +1,7 @@
 "=============================================================================
 " FILE: sorter_default.vim
 " AUTHOR:  Shougo Matsushita <Shougo.Matsu@gmail.com>
+" Last Modified: 19 Oct 2012.
 " License: MIT license  {{{
 "     Permission is hereby granted, free of charge, to any person obtaining
 "     a copy of this software and associated documentation files (the
@@ -26,7 +27,7 @@
 let s:save_cpo = &cpo
 set cpo&vim
 
-function! unite#filters#sorter_default#define() abort "{{{
+function! unite#filters#sorter_default#define() "{{{
   return s:sorter
 endfunction"}}}
 
@@ -35,7 +36,7 @@ let s:sorter = {
       \ 'description' : 'default sorter',
       \}
 
-function! s:sorter.filter(candidates, context) abort "{{{
+function! s:sorter.filter(candidates, context) "{{{
   let candidates = a:candidates
   for default in s:default_sorters
     let filter = unite#get_filters(default)
@@ -49,10 +50,10 @@ endfunction"}}}
 
 
 let s:default_sorters = ['sorter_nothing']
-function! unite#filters#sorter_default#get() abort "{{{
+function! unite#filters#sorter_default#get() "{{{
   return s:default_sorters
 endfunction"}}}
-function! unite#filters#sorter_default#use(sorters) abort "{{{
+function! unite#filters#sorter_default#use(sorters) "{{{
   let s:default_sorters = type(a:sorters) == type([]) ?
         \ a:sorters : [a:sorters]
 endfunction"}}}

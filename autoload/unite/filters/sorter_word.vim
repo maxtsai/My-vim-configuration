@@ -1,6 +1,7 @@
 "=============================================================================
 " FILE: sorter_word.vim
 " AUTHOR:  Shougo Matsushita <Shougo.Matsu@gmail.com>
+" Last Modified: 22 Apr 2011.
 " License: MIT license  {{{
 "     Permission is hereby granted, free of charge, to any person obtaining
 "     a copy of this software and associated documentation files (the
@@ -26,7 +27,7 @@
 let s:save_cpo = &cpo
 set cpo&vim
 
-function! unite#filters#sorter_word#define() abort "{{{
+function! unite#filters#sorter_word#define() "{{{
   return s:sorter
 endfunction"}}}
 
@@ -35,9 +36,8 @@ let s:sorter = {
       \ 'description' : 'sort by word order',
       \}
 
-function! s:sorter.filter(candidates, context) abort "{{{
-  return unite#util#sort_by(a:candidates, (&ignorecase ?
-        \ 'tolower(v:val.word)' : 'v:val.word'))
+function! s:sorter.filter(candidates, context) "{{{
+  return unite#util#sort_by(a:candidates, 'v:val.word')
 endfunction"}}}
 
 let &cpo = s:save_cpo

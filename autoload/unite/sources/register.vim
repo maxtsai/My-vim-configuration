@@ -1,6 +1,7 @@
 "=============================================================================
 " FILE: register.vim
 " AUTHOR:  Shougo Matsushita <Shougo.Matsu@gmail.com>
+" Last Modified: 24 Jan 2013.
 " License: MIT license  {{{
 "     Permission is hereby granted, free of charge, to any person obtaining
 "     a copy of this software and associated documentation files (the
@@ -26,7 +27,7 @@
 let s:save_cpo = &cpo
 set cpo&vim
 
-function! unite#sources#register#define() abort "{{{
+function! unite#sources#register#define() "{{{
   return s:source
 endfunction"}}}
 
@@ -37,27 +38,25 @@ let s:source = {
       \ 'default_kind' : 'word',
       \}
 
-function! s:source.gather_candidates(args, context) abort "{{{
+function! s:source.gather_candidates(args, context) "{{{
   let candidates = []
 
-  let registers = split(get(a:args, 0, ''), '\zs')
-
-  for reg in (has('clipboard') ? ['+', '*'] : []) + [
-        \   '"',
-        \   '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
-        \   'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j',
-        \   'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't',
-        \   'u', 'v', 'w', 'x', 'y', 'z',
-        \   '-', '.', ':', '#', '%', '/', '=',
+  let max_width = winwidth(0) - 5
+  let registers = [
+        \ '"', '+', '*',
+        \ '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
+        \ 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j',
+        \ 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't',
+        \ 'u', 'v', 'w', 'x', 'y', 'z',
+        \ '-', '.', ':', '#', '%', '/', '=',
         \ ]
+
+  for reg in registers
     let register = getreg(reg, 1)
-    if (empty(registers) && register != ''
-          \ && register !~ '[\x01-\x08\x10-\x1a\x1c-\x1f]\{3,}')
-          \ || index(registers, reg) >= 0
+    if register != ''
       call add(candidates, {
             \ 'word' : register,
-            \ 'abbr' : printf('%-3s - %s', reg,
-            \     substitute(register, '\n', '^@', 'g')),
+            \ 'abbr' : printf('%-3s - %s', reg, register),
             \ 'is_multiline' : 1,
             \ 'action__register' : reg,
             \ 'action__regtype' : getregtype(reg),
@@ -75,7 +74,7 @@ let s:source.action_table.delete = {
       \ 'is_quit' : 0,
       \ 'is_selectable' : 1,
       \ }
-function! s:source.action_table.delete.func(candidates) abort "{{{
+function! s:source.action_table.delete.func(candidates) "{{{
   for candidate in a:candidates
     silent! call setreg(candidate.action__register, '')
   endfor
@@ -86,17 +85,13 @@ let s:source.action_table.edit = {
       \ 'is_invalidate_cache' : 1,
       \ 'is_quit' : 0,
       \ }
-function! s:source.action_table.edit.func(candidate) abort "{{{
+function! s:source.action_table.edit.func(candidate) "{{{
   let register = getreg(a:candidate.action__register, 1)
   let register = substitute(register, '\r\?\n', '\\n', 'g')
   let new_value = substitute(input('', register), '\\n', '\n', 'g')
-  " If the user cancels input, new_value is empty, so assume no change on empty.
-  " User can delete explicity via the `delete` action.
-  if new_value != ''
-      silent! call setreg(a:candidate.action__register,
-            \ new_value, a:candidate.action__regtype)
-  endif
-  endfunction"}}}
+  silent! call setreg(a:candidate.action__register,
+        \ new_value, a:candidate.action__regtype)
+endfunction"}}}
 "}}}
 
 let &cpo = s:save_cpo

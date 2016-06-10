@@ -1,6 +1,7 @@
 "=============================================================================
 " FILE: tab.vim
 " AUTHOR:  Shougo Matsushita <Shougo.Matsu@gmail.com>
+" Last Modified: 25 Apr 2013.
 " License: MIT license  {{{
 "     Permission is hereby granted, free of charge, to any person obtaining
 "     a copy of this software and associated documentation files (the
@@ -26,7 +27,7 @@
 let s:save_cpo = &cpo
 set cpo&vim
 
-function! unite#kinds#tab#define() abort "{{{
+function! unite#kinds#tab#define() "{{{
   return s:kind
 endfunction"}}}
 
@@ -41,7 +42,7 @@ let s:kind = {
 let s:kind.action_table.open = {
       \ 'description' : 'open this tab',
       \ }
-function! s:kind.action_table.open.func(candidate) abort "{{{
+function! s:kind.action_table.open.func(candidate) "{{{
   execute 'tabnext' a:candidate.action__tab_nr
 endfunction"}}}
 
@@ -51,7 +52,7 @@ let s:kind.action_table.delete = {
       \ 'is_invalidate_cache' : 1,
       \ 'is_quit' : 0,
       \ }
-function! s:kind.action_table.delete.func(candidates) abort "{{{
+function! s:kind.action_table.delete.func(candidates) "{{{
   for candidate in sort(a:candidates, 's:compare')
     execute 'tabclose' candidate.action__tab_nr
   endfor
@@ -61,7 +62,7 @@ let s:kind.action_table.preview = {
       \ 'description' : 'preview tab',
       \ 'is_quit' : 0,
       \ }
-function! s:kind.action_table.preview.func(candidate) abort "{{{
+function! s:kind.action_table.preview.func(candidate) "{{{
   let tabnr = tabpagenr()
   execute 'tabnext' a:candidate.action__tab_nr
   redraw
@@ -73,7 +74,7 @@ let s:kind.action_table.unite__new_candidate = {
       \ 'description' : 'create new tab',
       \ 'is_invalidate_cache' : 1,
       \ }
-function! s:kind.action_table.unite__new_candidate.func(candidate) abort "{{{
+function! s:kind.action_table.unite__new_candidate.func(candidate) "{{{
   let title = input('Please input tab title: ', '',
         \ 'customlist,' . s:SID_PREFIX() . 'history_complete')
 
@@ -84,11 +85,11 @@ function! s:kind.action_table.unite__new_candidate.func(candidate) abort "{{{
 endfunction"}}}
 
 " Anywhere SID.
-function! s:SID_PREFIX() abort
+function! s:SID_PREFIX()
   return matchstr(expand('<sfile>'), '<SNR>\d\+_\zeSID_PREFIX$')
 endfunction
 
-function! s:history_complete(arglead, cmdline, cursorpos) abort
+function! s:history_complete(arglead, cmdline, cursorpos)
   return filter(map(reverse(range(1, histnr('input'))),
   \                     'histget("input", v:val)'),
   \                 'v:val != "" && stridx(v:val, a:arglead) == 0')
@@ -104,7 +105,7 @@ if exists('*gettabvar')
       \ 'is_invalidate_cache' : 1,
       \ 'is_quit' : 0,
         \ }
-  function! s:kind.action_table.rename.func(candidates) abort "{{{
+  function! s:kind.action_table.rename.func(candidates) "{{{
     for candidate in a:candidates
       let old_title = gettabvar(candidate.action__tab_nr, 'title')
       let title = input(printf('New title: %s -> ', old_title), old_title)
@@ -117,7 +118,7 @@ endif
 "}}}
 
 " Misc
-function! s:compare(candidate_a, candidate_b) abort "{{{
+function! s:compare(candidate_a, candidate_b) "{{{
   return a:candidate_b.action__tab_nr - a:candidate_a.action__tab_nr
 endfunction"}}}
 

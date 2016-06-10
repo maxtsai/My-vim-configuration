@@ -1,6 +1,7 @@
 "=============================================================================
 " FILE: matcher_regexp.vim
 " AUTHOR:  Shougo Matsushita <Shougo.Matsu@gmail.com>
+" Last Modified: 08 Apr 2013.
 " License: MIT license  {{{
 "     Permission is hereby granted, free of charge, to any person obtaining
 "     a copy of this software and associated documentation files (the
@@ -26,7 +27,7 @@
 let s:save_cpo = &cpo
 set cpo&vim
 
-function! unite#filters#matcher_regexp#define() abort "{{{
+function! unite#filters#matcher_regexp#define() "{{{
   return s:matcher
 endfunction"}}}
 
@@ -35,22 +36,14 @@ let s:matcher = {
       \ 'description' : 'regular expression matcher',
       \}
 
-function! s:matcher.pattern(input) abort "{{{
-  return a:input
-endfunction"}}}
-
-function! s:matcher.filter(candidates, context) abort "{{{
+function! s:matcher.filter(candidates, context) "{{{
   if a:context.input == ''
-    return unite#filters#filter_matcher(
+    return unite#util#filter_matcher(
           \ a:candidates, '', a:context)
   endif
 
   let candidates = a:candidates
   for input in a:context.input_list
-    if input == '!' || input == ''
-      continue
-    endif
-    let a:context.input = input
     let candidates = unite#filters#matcher_regexp#regexp_matcher(
           \ candidates, input, a:context)
   endfor
@@ -58,16 +51,16 @@ function! s:matcher.filter(candidates, context) abort "{{{
   return candidates
 endfunction"}}}
 
-function! unite#filters#matcher_regexp#regexp_matcher(candidates, input, context) abort "{{{
-  let expr = unite#filters#matcher_regexp#get_expr(a:input, a:context)
+function! unite#filters#matcher_regexp#regexp_matcher(candidates, input, context) "{{{
+  let expr = unite#filters#matcher_regexp#get_expr(a:input)
 
   try
-    return unite#filters#filter_matcher(a:candidates, expr, a:context)
+    return unite#util#filter_matcher(a:candidates, expr, a:context)
   catch
     return []
   endtry
 endfunction"}}}
-function! unite#filters#matcher_regexp#get_expr(input, context) abort "{{{
+function! unite#filters#matcher_regexp#get_expr(input) "{{{
   let input = a:input
 
   if input =~ '^!'
@@ -77,14 +70,9 @@ function! unite#filters#matcher_regexp#get_expr(input, context) abort "{{{
 
     " Exclusion match.
     let expr = 'v:val.word !~ '.string(input[1:])
-  elseif input =~ '^:'
-    " Executes command.
-    let a:context.execute_command = input[1:]
-    return '1'
   elseif input !~ '[~\\.^$\[\]*]'
     if unite#util#has_lua()
       let expr = 'if_lua'
-      let a:context.input_lua = input
     else
       " Optimized filter.
       let input = substitute(input, '\\\(.\)', '\1', 'g')

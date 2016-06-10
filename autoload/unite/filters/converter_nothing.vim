@@ -1,6 +1,7 @@
 "=============================================================================
 " FILE: converter_nothing.vim
 " AUTHOR:  Shougo Matsushita <Shougo.Matsu@gmail.com>
+" Last Modified: 22 Apr 2011.
 " License: MIT license  {{{
 "     Permission is hereby granted, free of charge, to any person obtaining
 "     a copy of this software and associated documentation files (the
@@ -26,7 +27,7 @@
 let s:save_cpo = &cpo
 set cpo&vim
 
-function! unite#filters#converter_nothing#define() abort "{{{
+function! unite#filters#converter_nothing#define() "{{{
   return s:converter
 endfunction"}}}
 
@@ -35,7 +36,7 @@ let s:converter = {
       \ 'description' : 'nothing converter',
       \}
 
-function! s:converter.filter(candidates, context) abort "{{{
+function! s:converter.filter(candidates, context) "{{{
   " Nothing.
   return a:candidates
 endfunction"}}}

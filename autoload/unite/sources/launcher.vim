@@ -1,6 +1,7 @@
 "=============================================================================
 " FILE: launcher.vim
 " AUTHOR:  Shougo Matsushita <Shougo.Matsu@gmail.com>
+" Last Modified: 02 Oct 2012.
 " License: MIT license  {{{
 "     Permission is hereby granted, free of charge, to any person obtaining
 "     a copy of this software and associated documentation files (the
@@ -29,7 +30,7 @@ set cpo&vim
 " Variables  "{{{
 "}}}
 
-function! unite#sources#launcher#define() abort "{{{
+function! unite#sources#launcher#define() "{{{
   return s:source
 endfunction"}}}
 
@@ -37,12 +38,10 @@ let s:source = {
       \ 'name' : 'launcher',
       \ 'description' : 'candidates from executable files',
       \ 'default_kind' : 'guicmd',
-      \ 'converters' : 'converter_file_directory',
-      \ 'max_candidates' : 100,
       \ }
 
 let s:cached_result = {}
-function! s:source.gather_candidates(args, context) abort "{{{
+function! s:source.gather_candidates(args, context) "{{{
   let path = get(a:args, 0, '')
   if path == ''
     " Use $PATH.
@@ -51,28 +50,25 @@ function! s:source.gather_candidates(args, context) abort "{{{
   endif
 
   if !has_key(s:cached_result, path) || a:context.is_redraw
-    let s:cached_result[path] = map(
-          \ unite#sources#launcher#get_executables(path), "{
+    " Search executable files from $PATH.
+    let files = split(globpath(path, '*'), '\n')
+
+    if unite#util#is_windows()
+      let exts = escape(substitute($PATHEXT . ';.LNK', ';', '\\|', 'g'), '.')
+      let pattern = '"." . fnamemodify(v:val, ":e") =~? '.string(exts)
+    else
+      let pattern = 'executable(v:val)'
+    endif
+
+    call filter(files, pattern)
+
+    let s:cached_result[path] = map(files, "{
           \ 'word' : v:val,
           \ 'action__path' : v:val,
           \ }")
   endif
 
   return s:cached_result[path]
-endfunction"}}}
-
-function! unite#sources#launcher#get_executables(path) abort "{{{
-  " Search executable files from $PATH.
-  let files = unite#util#uniq(split(globpath(a:path, '*'), '\n'))
-
-  if unite#util#is_windows()
-    let exts = escape(substitute($PATHEXT . ';.LNK', ';', '\\|', 'g'), '.')
-    let pattern = '"." . fnamemodify(v:val, ":e") =~? '.string(exts)
-  else
-    let pattern = 'executable(v:val)'
-  endif
-
-  return filter(files, pattern)
 endfunction"}}}
 
 let &cpo = s:save_cpo

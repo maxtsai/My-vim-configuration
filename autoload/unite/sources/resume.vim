@@ -1,6 +1,7 @@
 "=============================================================================
 " FILE: resume.vim
 " AUTHOR:  Shougo Matsushita <Shougo.Matsu@gmail.com>
+" Last Modified: 06 Oct 2012.
 " License: MIT license  {{{
 "     Permission is hereby granted, free of charge, to any person obtaining
 "     a copy of this software and associated documentation files (the
@@ -26,7 +27,7 @@
 let s:save_cpo = &cpo
 set cpo&vim
 
-function! unite#sources#resume#define() abort "{{{
+function! unite#sources#resume#define() "{{{
   return s:source
 endfunction"}}}
 
@@ -36,39 +37,30 @@ let s:source = {
       \ 'default_kind' : 'command',
       \}
 
-function! s:source.gather_candidates(args, context) abort "{{{
-  let a:context.source__unite_list = map(filter(range(1, bufnr('$')), "
+function! s:source.gather_candidates(args, context) "{{{
+  let a:context.source__buffer_list = filter(range(1, bufnr('$')), "
         \ getbufvar(v:val, '&filetype') ==# 'unite'
-        \  && getbufvar(v:val, 'unite').sources[0].name != 'resume'"),
-        \ "getbufvar(v:val, 'unite')")
-  let unite = unite#get_current_unite()
+        \  && !getbufvar(v:val, 'unite').context.temporary
+        \  && getbufvar(v:val, 'unite').sources[0].name != 'resume'")
 
-  let new_context = copy(unite.original_context)
-  " Disable the input
-  call remove(new_context, 'input')
-
-  let max_width = max(map(copy(a:context.source__unite_list),
-        \ 'len(v:val.buffer_name)'))
-  let candidates = map(copy(a:context.source__unite_list), "{
-        \ 'word' : v:val.buffer_name,
-        \ 'abbr' : printf('%-'.max_width.'s | '
-        \          . join(map(filter(copy(v:val.args),
-        \           'type(v:val) == type([])'),
-        \           'len(v:val[1]) == 0 ? v:val[0] :
-        \            v:val[0].'':''.join(filter(copy(v:val[1]),
-        \            ''type(v:val) == 1''), '':'')')),
-        \            v:val.buffer_name),
-        \ 'action__command' : printf('call unite#resume(%s, %s)',
-        \              string(v:val.buffer_name),
-        \              string(new_context)),
-        \ 'source__time' : v:val.access_time,
+  let max_width = max(map(copy(a:context.source__buffer_list),
+        \ 'len(getbufvar(v:val, "unite").buffer_name)'))
+  let candidates = map(copy(a:context.source__buffer_list), "{
+        \ 'word' : getbufvar(v:val, 'unite').buffer_name,
+        \ 'abbr' : printf('%-'.max_width.'s : '
+        \          . join(map(copy(getbufvar(v:val, 'unite').sources),
+        \              'v:val.name'), ', '),
+        \            getbufvar(v:val, 'unite').buffer_name),
+        \ 'action__command' : 'UniteResume ' .
+        \          getbufvar(v:val, 'unite').buffer_name,
+        \ 'source__time' : getbufvar(v:val, 'unite').access_time,
         \}")
 
   return sort(candidates, 's:compare')
 endfunction"}}}
 
 " Misc.
-function! s:compare(candidate_a, candidate_b) abort "{{{
+function! s:compare(candidate_a, candidate_b) "{{{
   return a:candidate_b.source__time - a:candidate_a.source__time
 endfunction"}}}
 

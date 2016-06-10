@@ -1,6 +1,7 @@
 "=============================================================================
 " FILE: mapping.vim
 " AUTHOR:  Shougo Matsushita <Shougo.Matsu@gmail.com>
+" Last Modified: 21 Oct 2012.
 " License: MIT license  {{{
 "     Permission is hereby granted, free of charge, to any person obtaining
 "     a copy of this software and associated documentation files (the
@@ -29,7 +30,7 @@ set cpo&vim
 " Variables  "{{{
 "}}}
 
-function! unite#sources#mapping#define() abort "{{{
+function! unite#sources#mapping#define() "{{{
   return s:source
 endfunction"}}}
 
@@ -42,7 +43,7 @@ let s:source = {
       \ }
 
 let s:cached_result = []
-function! s:source.hooks.on_init(args, context) abort "{{{
+function! s:source.hooks.on_init(args, context) "{{{
   " Get buffer number.
   let bufnr = get(a:args, 0, bufnr('%'))
   let oldnr = bufnr('%')
@@ -78,15 +79,15 @@ function! s:source.hooks.on_init(args, context) abort "{{{
 
     call add(s:cached_result, {
           \ 'word' : line,
-          \ 'action__command' : 'call feedkeys("' . map . '")',
+          \ 'action__command' : 'execute "normal ' . map . '"',
           \ 'action__mapping' : map,
           \ })
   endfor
 endfunction"}}}
-function! s:source.gather_candidates(args, context) abort "{{{
+function! s:source.gather_candidates(args, context) "{{{
   return s:cached_result
 endfunction"}}}
-function! s:source.complete(args, context, arglead, cmdline, cursorpos) abort "{{{
+function! s:source.complete(args, context, arglead, cmdline, cursorpos) "{{{
   return filter(range(1, bufnr('$')), 'buflisted(v:val)')
 endfunction"}}}
 
@@ -95,7 +96,7 @@ let s:source.action_table.preview = {
       \ 'description' : 'view the help documentation',
       \ 'is_quit' : 0,
       \ }
-function! s:source.action_table.preview.func(candidate) abort "{{{
+function! s:source.action_table.preview.func(candidate) "{{{
   let winnr = winnr()
 
   try
@@ -104,6 +105,7 @@ function! s:source.action_table.preview.func(candidate) abort "{{{
     normal! zv
     normal! zt
     setlocal previewwindow
+    setlocal winfixheight
   catch /^Vim\%((\a\+)\)\?:E149/
     " Ignore
   endtry

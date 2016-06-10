@@ -1,6 +1,7 @@
 "=============================================================================
 " FILE: converter_default.vim
 " AUTHOR:  Shougo Matsushita <Shougo.Matsu@gmail.com>
+" Last Modified: 19 Oct 2012.
 " License: MIT license  {{{
 "     Permission is hereby granted, free of charge, to any person obtaining
 "     a copy of this software and associated documentation files (the
@@ -26,7 +27,7 @@
 let s:save_cpo = &cpo
 set cpo&vim
 
-function! unite#filters#converter_default#define() abort "{{{
+function! unite#filters#converter_default#define() "{{{
   return s:converter
 endfunction"}}}
 
@@ -35,7 +36,7 @@ let s:converter = {
       \ 'description' : 'default converter',
       \}
 
-function! s:converter.filter(candidates, context) abort "{{{
+function! s:converter.filter(candidates, context) "{{{
   let candidates = a:candidates
   for default in s:default_converters
     let filter = unite#get_filters(default)
@@ -49,10 +50,10 @@ endfunction"}}}
 
 
 let s:default_converters = ['converter_nothing']
-function! unite#filters#converter_default#get() abort "{{{
+function! unite#filters#converter_default#get() "{{{
   return s:default_converters
 endfunction"}}}
-function! unite#filters#converter_default#use(converters) abort "{{{
+function! unite#filters#converter_default#use(converters) "{{{
   let s:default_converters = type(a:converters) == type([]) ?
         \ a:converters : [a:converters]
 endfunction"}}}

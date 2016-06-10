@@ -1,6 +1,7 @@
 "=============================================================================
 " FILE: buffer.vim
 " AUTHOR:  Shougo Matsushita <Shougo.Matsu@gmail.com>
+" Last Modified: 16 Feb 2013.
 " License: MIT license  {{{
 "     Permission is hereby granted, free of charge, to any person obtaining
 "     a copy of this software and associated documentation files (the
@@ -27,13 +28,40 @@ let s:save_cpo = &cpo
 set cpo&vim
 
 " Variables  "{{{
+let s:buffer_list = {}
+
 call unite#util#set_default(
       \ 'g:unite_source_buffer_time_format',
       \ '(%Y/%m/%d %H:%M:%S) ')
 "}}}
 
-function! unite#sources#buffer#define() abort "{{{
+function! unite#sources#buffer#define() "{{{
   return [s:source_buffer_all, s:source_buffer_tab]
+endfunction"}}}
+function! unite#sources#buffer#_append() "{{{
+  " Append the current buffer.
+  let bufnr = bufnr('%')
+  let s:buffer_list[bufnr] = {
+        \ 'action__buffer_nr' : bufnr,
+        \ 'source__time' : localtime(),
+        \ }
+
+  if !exists('t:unite_buffer_dictionary')
+    let t:unite_buffer_dictionary = {}
+  endif
+
+  if exists('*gettabvar')
+    " Delete same buffer in other tab pages.
+    for tabnr in range(1, tabpagenr('$'))
+      let buffer_dict = gettabvar(tabnr, 'unite_buffer_dictionary')
+      if type(buffer_dict) == type({}) && has_key(buffer_dict, bufnr)
+        call remove(buffer_dict, bufnr)
+      endif
+      unlet buffer_dict
+    endfor
+  endif
+
+  let t:unite_buffer_dictionary[bufnr] = 1
 endfunction"}}}
 
 let s:source_buffer_all = {
@@ -44,144 +72,99 @@ let s:source_buffer_all = {
       \ 'default_kind' : 'buffer',
       \}
 
-function! s:source_buffer_all.hooks.on_init(args, context) abort "{{{
-  let a:context.source__is_bang =
-        \ (get(a:args, 0, '') ==# '!')
-  let a:context.source__is_question =
-        \ (get(a:args, 0, '') ==# '?')
-  let a:context.source__is_plus =
-        \ (get(a:args, 0, '') ==# '+')
-  let a:context.source__is_minus =
-        \ (get(a:args, 0, '') ==# '-')
-  let a:context.source__is_terminal =
-        \ (get(a:args, 0, '') ==# 't')
-  let a:context.source__buffer_list =
-        \ s:get_buffer_list(a:context.source__is_bang,
-        \                   a:context.source__is_question,
-        \                   a:context.source__is_plus,
-        \                   a:context.source__is_minus,
-        \                   a:context.source__is_terminal)
+function! s:source_buffer_all.hooks.on_init(args, context) "{{{
+  return s:init_context(a:args, a:context)
 endfunction"}}}
-function! s:source_buffer_all.hooks.on_syntax(args, context) abort "{{{
-  syntax match uniteSource__Buffer_Name /[^/ \[\]]\+\s/
-        \ contained containedin=uniteSource__Buffer
-  highlight default link uniteSource__Buffer_Name Function
-  syntax match uniteSource__Buffer_Prefix /\d\+\s\%(\S\+\)\?/
-        \ contained containedin=uniteSource__Buffer
-  highlight default link uniteSource__Buffer_Prefix Constant
-  syntax match uniteSource__Buffer_Info /\[.\{-}\] /
-        \ contained containedin=uniteSource__Buffer
-  highlight default link uniteSource__Buffer_Info PreProc
-  syntax match uniteSource__Buffer_Modified /\[.\{-}+\]/
-        \ contained containedin=uniteSource__Buffer
-  highlight default link uniteSource__Buffer_Modified Statement
-  syntax match uniteSource__Buffer_NoFile /\[nofile\]/
-        \ contained containedin=uniteSource__Buffer
-  highlight default link uniteSource__Buffer_NoFile Function
-  syntax match uniteSource__Buffer_Time /(.\{-}) /
-        \ contained containedin=uniteSource__Buffer
-  highlight default link uniteSource__Buffer_Time Statement
-endfunction"}}}
-function! s:source_buffer_all.hooks.on_post_filter(args, context) abort "{{{
-  for candidate in a:context.candidates
-    let candidate.action__path =
-          \ unite#util#substitute_path_separator(
-          \       fnamemodify(s:make_word(candidate.action__buffer_nr), ':p'))
-    let candidate.action__directory =
-          \ unite#helper#get_buffer_directory(candidate.action__buffer_nr)
-  endfor
+function! s:source_buffer_all.hooks.on_syntax(args, context) "{{{
+  return s:on_syntax(a:args, a:context)
 endfunction"}}}
 
-function! s:source_buffer_all.gather_candidates(args, context) abort "{{{
+function! s:source_buffer_all.gather_candidates(args, context) "{{{
   if a:context.is_redraw
     " Recaching.
     let a:context.source__buffer_list =
           \ s:get_buffer_list(a:context.source__is_bang,
-          \                   a:context.source__is_question,
-          \                   a:context.source__is_plus,
-          \                   a:context.source__is_minus,
-          \                   a:context.source__is_terminal)
+          \                   a:context.source__is_question)
   endif
 
-  let candidates = map(a:context.source__buffer_list, "{
-        \ 'word' : unite#util#substitute_path_separator(
-        \         s:make_word(v:val.action__buffer_nr)),
+  let candidates = map(copy(a:context.source__buffer_list), "{
+        \ 'word' : s:make_word(v:val.action__buffer_nr),
         \ 'abbr' : s:make_abbr(v:val.action__buffer_nr, v:val.source__flags)
-        \        . s:format_time(v:val.source__time),
+        \        . strftime(g:unite_source_buffer_time_format, v:val.source__time),
+        \ 'action__path' : unite#substitute_path_separator(bufname(v:val.action__buffer_nr)),
         \ 'action__buffer_nr' : v:val.action__buffer_nr,
+        \ 'action__directory' : s:get_directory(v:val.action__buffer_nr),
         \}")
 
   return candidates
 endfunction"}}}
-function! s:source_buffer_all.complete(args, context, arglead, cmdline, cursorpos) abort "{{{
-  return ['!', '?', '+', '-', 't']
+function! s:source_buffer_all.complete(args, context, arglead, cmdline, cursorpos) "{{{
+  return ['!', '?']
 endfunction"}}}
 
-let s:source_buffer_tab = deepcopy(s:source_buffer_all)
-let s:source_buffer_tab.name = 'buffer_tab'
-let s:source_buffer_tab.description =
-      \ 'candidates from buffer list in current tab'
+let s:source_buffer_tab = {
+      \ 'name' : 'buffer_tab',
+      \ 'description' : 'candidates from buffer list in current tab',
+      \ 'syntax' : 'uniteSource__Buffer',
+      \ 'hooks' : {},
+      \ 'default_kind' : 'buffer',
+      \}
 
-function! s:source_buffer_tab.gather_candidates(args, context) abort "{{{
+function! s:source_buffer_tab.hooks.on_init(args, context) "{{{
+  return s:init_context(a:args, a:context)
+endfunction"}}}
+function! s:source_buffer_tab.hooks.on_syntax(args, context) "{{{
+  return s:on_syntax(a:args, a:context)
+endfunction"}}}
+
+function! s:source_buffer_tab.gather_candidates(args, context) "{{{
   if a:context.is_redraw
     " Recaching.
     let a:context.source__buffer_list =
           \ s:get_buffer_list(a:context.source__is_bang,
-          \                   a:context.source__is_question,
-          \                   a:context.source__is_plus,
-          \                   a:context.source__is_minus,
-          \                   a:context.source__is_terminal)
+          \                   a:context.source__is_question)
   endif
 
-  if !exists('g:loaded_tabpagebuffer') && !exists('g:CtrlSpaceLoaded')
-    call unite#print_source_message(
-          \ 'tabpagebuffer or ctrlspace plugin is not installed.', self.name)
-    return []
-  endif
-
-  if exists('t:tabpagebuffer')
-    let bufferlist = t:tabpagebuffer
-  elseif exists('t:CtrlSpaceList')
-    let bufferlist = t:CtrlSpaceList
-  else
-    return []
+  if !exists('t:unite_buffer_dictionary')
+    let t:unite_buffer_dictionary = {}
   endif
 
   let list = filter(copy(a:context.source__buffer_list),
-        \ 'has_key(bufferlist, v:val.action__buffer_nr)')
+        \ 'has_key(t:unite_buffer_dictionary, v:val.action__buffer_nr)')
 
   let candidates = map(list, "{
-        \ 'word' : unite#util#substitute_path_separator(
-        \       fnamemodify(s:make_word(v:val.action__buffer_nr), ':p')),
+        \ 'word' : s:make_word(v:val.action__buffer_nr),
         \ 'abbr' : s:make_abbr(v:val.action__buffer_nr, v:val.source__flags)
-        \        . s:format_time(v:val.source__time),
+        \        . strftime(g:unite_source_buffer_time_format, v:val.source__time),
+        \ 'action__path' : unite#substitute_path_separator(
+        \        bufname(v:val.action__buffer_nr)),
         \ 'action__buffer_nr' : v:val.action__buffer_nr,
+        \ 'action__directory' : s:get_directory(v:val.action__buffer_nr),
         \}")
 
   return candidates
 endfunction"}}}
+function! s:source_buffer_tab.complete(args, context, arglead, cmdline, cursorpos) "{{{
+  return ['!', '?']
+endfunction"}}}
 
 " Misc
-function! s:make_word(bufnr) abort "{{{
+function! s:make_word(bufnr) "{{{
   let filetype = getbufvar(a:bufnr, '&filetype')
   if filetype ==# 'vimfiler'
-    let path = unite#util#substitute_path_separator(
-          \ simplify(getbufvar(a:bufnr, 'vimfiler').current_dir))
-    let path = unite#util#substitute_path_separator(
-          \ simplify(bufname(a:bufnr))) . ' ' . path . '/'
+    let path = getbufvar(a:bufnr, 'vimfiler').current_dir
+    let path = printf('*vimfiler* [%s]', unite#substitute_path_separator(simplify(path)))
   elseif filetype ==# 'vimshell'
-    let path = unite#util#substitute_path_separator(
-          \ simplify(getbufvar(a:bufnr, 'vimshell').current_dir))
-    let path = unite#util#substitute_path_separator(
-          \ simplify(bufname(a:bufnr))) . ' ' . path . '/'
+    let vimshell = getbufvar(a:bufnr, 'vimshell')
+    let path = printf('*vimshell*: [%s]',
+          \ unite#substitute_path_separator(simplify(vimshell.current_dir)))
   else
-    let path = unite#util#substitute_path_separator(
-          \ simplify(bufname(a:bufnr)))
+    let path = unite#substitute_path_separator(simplify(bufname(a:bufnr)))
   endif
 
   return path
 endfunction"}}}
-function! s:make_abbr(bufnr, flags) abort "{{{
+function! s:make_abbr(bufnr, flags) "{{{
   let bufname = fnamemodify(bufname(a:bufnr), ':t')
   if bufname == ''
     let bufname = bufname(a:bufnr)
@@ -201,32 +184,36 @@ function! s:make_abbr(bufnr, flags) abort "{{{
 
     let path = printf('%s [%s : %s]', bufname, path, filetype)
   else
-    let path = bufname(a:bufnr) == '' ? 'No Name' :
-          \ simplify(fnamemodify(bufname(a:bufnr), ':~:.'))
+    let path = simplify(fnamemodify(bufname(a:bufnr), ':~:.'))
     if a:flags != ''
-      " Format flags so that buffer numbers are aligned on the left.
-      " example: '42 a% +' => '42 a%+ '
-      "          '3 h +'   => ' 3 h+  '
-      let nowhitespace = substitute(a:flags, '\s*', '', 'g')
-      let path = substitute(nowhitespace, '\(\d\+\)\(.*\)',
-            \ '\=printf("%*s %-*s", len(bufnr("$")),
-            \    submatch(1), 4, submatch(2))', 'g') . path
+      let path .= ' [' . a:flags . ']'
     endif
 
     if filetype != ''
-      let path .= ' [' . filetype . ']'
+      let path .= '[' . filetype . ']'
     endif
   endif
 
   return (getbufvar(a:bufnr, '&buftype') =~# 'nofile' ? '[nofile] ' : '' ) .
          \ unite#util#substitute_path_separator(path) . ' '
 endfunction"}}}
-function! s:compare(candidate_a, candidate_b) abort "{{{
-  return a:candidate_a.action__buffer_nr == unite#get_current_unite().prev_bufnr ?  1 :
-      \ (a:candidate_b.action__buffer_nr == unite#get_current_unite().prev_bufnr ? -1 :
-      \ a:candidate_b.source__time - a:candidate_a.source__time)
+function! s:compare(candidate_a, candidate_b) "{{{
+  return a:candidate_b.source__time - a:candidate_a.source__time
 endfunction"}}}
-function! s:get_buffer_list(is_bang, is_question, is_plus, is_minus, is_terminal) abort "{{{
+function! s:get_directory(bufnr) "{{{
+  let filetype = getbufvar(a:bufnr, '&filetype')
+  if filetype ==# 'vimfiler'
+    let dir = getbufvar(a:bufnr, 'vimfiler').current_dir
+  elseif filetype ==# 'vimshell'
+    let dir = getbufvar(a:bufnr, 'vimshell').current_dir
+  else
+    let path = unite#substitute_path_separator(bufname(a:bufnr))
+    let dir = unite#path2directory(path)
+  endif
+
+  return dir
+endfunction"}}}
+function! s:get_buffer_list(is_bang, is_question) "{{{
   " Get :ls flags.
   redir => output
   silent! ls
@@ -240,10 +227,10 @@ function! s:get_buffer_list(is_bang, is_question, is_plus, is_minus, is_terminal
   " Make buffer list.
   let list = []
   let bufnr = 1
-  let buffer_list = unite#sources#buffer#variables#get_buffer_list()
   while bufnr <= bufnr('$')
-    if s:is_listed(a:is_bang, a:is_question, a:is_plus, a:is_minus, a:is_terminal, bufnr)
-      let dict = get(buffer_list, bufnr, {
+    if s:is_listed(a:is_bang, a:is_question, bufnr)
+          \ && bufnr != bufnr('%')
+      let dict = get(s:buffer_list, bufnr, {
             \ 'action__buffer_nr' : bufnr,
             \ 'source__time' : 0,
             \ })
@@ -256,30 +243,54 @@ function! s:get_buffer_list(is_bang, is_question, is_plus, is_minus, is_terminal
 
   call sort(list, 's:compare')
 
+  if s:is_listed(a:is_bang, a:is_question, bufnr('%'))
+    " Add current buffer.
+    let dict = get(s:buffer_list, bufnr('%'), {
+          \ 'action__buffer_nr' : bufnr('%'),
+          \ 'source__time' : 0,
+          \ })
+    let dict.source__flags = get(flag_dict, bufnr('%'), '')
+
+    call add(list, dict)
+  endif
+
   return list
 endfunction"}}}
+function! s:on_syntax(args, context) "{{{
+  syntax match uniteSource__Buffer_Name /[^/ \[\]]\+\s/
+        \ contained containedin=uniteSource__Buffer
+  highlight default link uniteSource__Buffer_Name Function
+  syntax match uniteSource__Buffer_Info /\[.\{-}\] /
+        \ contained containedin=uniteSource__Buffer
+  highlight default link uniteSource__Buffer_Info PreProc
+  syntax match uniteSource__Buffer_Modified /\[.\{-}+\]/
+        \ contained containedin=uniteSource__Buffer
+  highlight default link uniteSource__Buffer_Modified Statement
+  syntax match uniteSource__Buffer_NoFile /\[nofile\]/
+        \ contained containedin=uniteSource__Buffer
+  highlight default link uniteSource__Buffer_NoFile Function
+  syntax match uniteSource__Buffer_Time /(.\{-}) /
+        \ contained containedin=uniteSource__Buffer
+  highlight default link uniteSource__Buffer_Time Statement
+endfunction"}}}
 
-function! s:is_listed(is_bang, is_question, is_plus, is_minus, is_terminal, bufnr) abort "{{{
-  let bufname = bufname(a:bufnr)
-  let buftype = getbufvar(a:bufnr, '&buftype')
+function! s:init_context(args, context) "{{{
+  let a:context.source__is_bang =
+        \ (get(a:args, 0, '') ==# '!')
+  let a:context.source__is_question =
+        \ (get(a:args, 0, '') ==# '?')
+  let a:context.source__buffer_list =
+        \ s:get_buffer_list(a:context.source__is_bang,
+        \                   a:context.source__is_question)
+endfunction"}}}
+
+function! s:is_listed(is_bang, is_question, bufnr) "{{{
   return bufexists(a:bufnr) &&
         \ (a:is_question ? !buflisted(a:bufnr) :
         \    (a:is_bang || buflisted(a:bufnr)))
-        \ && (!a:is_plus || getbufvar(a:bufnr, '&mod'))
-        \ && (!a:is_minus || buftype == ''
-        \                     && bufname != ''
-        \                     && !isdirectory(bufname))
-        \ && (!a:is_terminal || buftype ==# 'terminal' )
         \ && (getbufvar(a:bufnr, '&filetype') !=# 'unite'
         \      || getbufvar(a:bufnr, 'unite').buffer_name !=#
         \         unite#get_current_unite().buffer_name)
-endfunction"}}}
-
-function! s:format_time(time) abort "{{{
-  if empty(a:time)
-    return ''
-  endif
-  return strftime(g:unite_source_buffer_time_format, a:time)
 endfunction"}}}
 
 let &cpo = s:save_cpo

@@ -1,6 +1,7 @@
 "=============================================================================
 " FILE: matcher_migemo.vim
 " AUTHOR:  Shougo Matsushita <Shougo.Matsu@gmail.com>
+" Last Modified: 04 Sep 2012.
 " License: MIT license  {{{
 "     Permission is hereby granted, free of charge, to any person obtaining
 "     a copy of this software and associated documentation files (the
@@ -26,7 +27,7 @@
 let s:save_cpo = &cpo
 set cpo&vim
 
-function! unite#filters#matcher_migemo#define() abort "{{{
+function! unite#filters#matcher_migemo#define() "{{{
   if !has('migemo') && !executable('cmigemo')
     " Not supported.
     return {}
@@ -44,11 +45,9 @@ function! unite#filters#matcher_migemo#define() abort "{{{
   return s:matcher
 endfunction"}}}
 
-function! s:search_dict() abort
-  let dict = s:search_dict2('cmigemo/'.&encoding.'/migemo-dict')
-  if dict == ''
-    let dict = s:search_dict2('migemo/'.&encoding.'/migemo-dict')
-  endif
+function! s:search_dict()
+  let dict = s:search_dict2('migemo/'.&encoding.'/migemo-dict')
+
   if dict == ''
     let dict = s:search_dict2(&encoding.'/migemo-dict')
   endif
@@ -59,25 +58,20 @@ function! s:search_dict() abort
   return dict
 endfunction
 
-function! s:search_dict2(name) abort
+function! s:search_dict2(name)
   let path = $VIM . ',' . &runtimepath
   let dict = globpath(path, 'dict/'.a:name)
   if dict == ''
     let dict = globpath(path, a:name)
   endif
   if dict == ''
-    " Search dictionary file from system.
-    for path in [
-          \ '/usr/local/share/'.a:name,
-          \ '/usr/share/'.a:name,
-          \ ]
-      if filereadable(path)
-        let dict = path
-      endif
-    endfor
+    let dict = '/usr/local/share/migemo/'.a:name
+    if !filereadable(dict)
+      return ''
+    endif
   endif
 
-  return get(split(dict, '\n'), 0, '')
+  return split(dict, '\n')[0]
 endfunction
 
 let s:matcher = {
@@ -85,7 +79,7 @@ let s:matcher = {
       \ 'description' : 'migemo matcher',
       \}
 
-function! s:matcher.filter(candidates, context) abort "{{{
+function! s:matcher.filter(candidates, context) "{{{
   if a:context.input == ''
     return a:candidates
   endif
@@ -99,17 +93,13 @@ function! s:matcher.filter(candidates, context) abort "{{{
       " Exclusion match.
       let expr = 'v:val.word !~ ' .
             \ string(s:get_migemo_pattern(input[1:]))
-    elseif input =~ '^:'
-      " Executes command.
-      let a:context.execute_command = input[1:]
-      continue
     else
       let expr = 'v:val.word =~ ' .
             \ string(s:get_migemo_pattern(input))
     endif
 
     try
-      let candidates = unite#filters#filter_matcher(
+      let candidates = unite#util#filter_matcher(
             \ candidates, expr, a:context)
     catch
       let candidates = []
@@ -118,11 +108,8 @@ function! s:matcher.filter(candidates, context) abort "{{{
 
   return candidates
 endfunction"}}}
-function! s:matcher.pattern(input) abort "{{{
-  return s:get_migemo_pattern(a:input)
-endfunction"}}}
 
-function! s:get_migemo_pattern(input) abort
+function! s:get_migemo_pattern(input)
   if has('migemo')
     " Use migemo().
     return migemo(a:input)

@@ -1,6 +1,7 @@
 "=============================================================================
 " FILE: sorter_reverse.vim
 " AUTHOR:  Shougo Matsushita <Shougo.Matsu@gmail.com>
+" Last Modified: 01 Sep 2011.
 " License: MIT license  {{{
 "     Permission is hereby granted, free of charge, to any person obtaining
 "     a copy of this software and associated documentation files (the
@@ -26,7 +27,7 @@
 let s:save_cpo = &cpo
 set cpo&vim
 
-function! unite#filters#sorter_reverse#define() abort "{{{
+function! unite#filters#sorter_reverse#define() "{{{
   return s:sorter
 endfunction"}}}
 
@@ -35,7 +36,7 @@ let s:sorter = {
       \ 'description' : 'sort by reverse order',
       \}
 
-function! s:sorter.filter(candidates, context) abort "{{{
+function! s:sorter.filter(candidates, context) "{{{
   return reverse(a:candidates)
 endfunction"}}}
 

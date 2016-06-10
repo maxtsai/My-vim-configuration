@@ -1,6 +1,7 @@
 "=============================================================================
 " FILE: command.vim
 " AUTHOR:  Shougo Matsushita <Shougo.Matsu@gmail.com>
+" Last Modified: 02 Sep 2012.
 " License: MIT license  {{{
 "     Permission is hereby granted, free of charge, to any person obtaining
 "     a copy of this software and associated documentation files (the
@@ -26,7 +27,7 @@
 let s:save_cpo = &cpo
 set cpo&vim
 
-function! unite#kinds#command#define() abort "{{{
+function! unite#kinds#command#define() "{{{
   return s:kind
 endfunction"}}}
 
@@ -40,28 +41,17 @@ let s:kind = {
 " Actions "{{{
 let s:kind.action_table.execute = {
       \ 'description' : 'execute command',
-      \ 'is_selectable' : 1,
       \ }
-function! s:kind.action_table.execute.func(candidates) abort "{{{
-  for candidate in a:candidates
-    if get(candidate, 'action__command_args', '0') !=# '0'
-      " Use edit action
-      call s:kind.action_table.edit.func(candidate)
-      continue
-    endif
-
-    let command = candidate.action__command
-    let type = get(candidate, 'action__type', ':')
-    if get(candidate, 'action__histadd', 0)
-      call s:add_history(type, command)
-    endif
-    call s:execute_command(type . command)
-  endfor
+function! s:kind.action_table.execute.func(candidate) "{{{
+  let command = a:candidate.action__command
+  let type = get(a:candidate, 'action__type', ':')
+  call s:add_history(type, command)
+  execute type . command
 endfunction"}}}
 let s:kind.action_table.edit = {
       \ 'description' : 'edit command',
       \ }
-function! s:kind.action_table.edit.func(candidate) abort "{{{
+function! s:kind.action_table.edit.func(candidate) "{{{
   if has_key(a:candidate, 'action__description')
     " Print description.
 
@@ -83,41 +73,18 @@ function! s:kind.action_table.edit.func(candidate) abort "{{{
   let command = input(':', a:candidate.action__command, 'command')
   if command != ''
     let type = get(a:candidate, 'action__type', ':')
-    if get(a:candidate, 'action__histadd', 0)
-      call s:add_history(type, command)
-    endif
-    call s:execute_command(command)
+    call s:add_history(type, command)
+    execute command
   endif
-endfunction"}}}
-let s:kind.action_table.grep = {
-      \ 'description' : 'grep this command',
-      \ 'is_start' : 1,
-      \ }
-function! s:kind.action_table.grep.func(candidate) abort "{{{
-  call unite#start_script([
-        \ ['grep', '', '', a:candidate.action__command]],
-        \ { 'no_quit' : 1, 'no_empty' : 1 })
+  " call feedkeys(':' . a:candidate.action__command, 'n')
 endfunction"}}}
 "}}}
-function! s:add_history(type, command) abort "{{{
+function! s:add_history(type, command)
   call histadd(a:type, a:command)
   if a:type ==# '/'
     let @/ = a:command
   endif
-endfunction"}}}
-function! s:execute_command(command) abort "{{{
-  let temp = tempname()
-  try
-    call writefile([a:command], temp)
-    execute 'source' fnameescape(temp)
-  catch /E486/
-    " Ignore search pattern error.
-  finally
-    if filereadable(temp)
-      call delete(temp)
-    endif
-  endtry
-endfunction"}}}
+endfunction
 
 let &cpo = s:save_cpo
 unlet s:save_cpo

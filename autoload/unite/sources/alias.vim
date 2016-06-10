@@ -2,6 +2,7 @@
 " FILE: alias.vim
 " AUTHOR:  Shougo Matsushita <Shougo.Matsu at gmail.com>
 "          tacroe <tacroe at gmail.com>
+" Last Modified: 26 May 2012.
 " License: MIT license  {{{
 "     Permission is hereby granted, free of charge, to any person obtaining
 "     a copy of this software and associated documentation files (the
@@ -29,16 +30,13 @@ set cpo&vim
 
 call unite#util#set_default('g:unite_source_alias_aliases', {})
 
-function! unite#sources#alias#define() abort
+function! unite#sources#alias#define()
   return s:make_aliases()
 endfunction
 
-function! s:make_aliases() abort
+function! s:make_aliases()
   let aliases = []
-
-  let user_aliases = map(copy(g:unite_source_alias_aliases),
-        \ "type(v:val) == type('') ? { 'source' : v:val } : v:val")
-  for [name, config] in items(user_aliases)
+  for [name, config] in items(g:unite_source_alias_aliases)
     let args =
           \ (!has_key(config, 'args')) ? [] :
           \ (type(config.args) == type([])) ?
@@ -52,7 +50,7 @@ function! s:make_aliases() abort
     let alias.source__args = args
     let alias.hooks = {}
 
-    function! alias.hooks.on_pre_init(args, context) abort
+    function! alias.hooks.on_pre_init(args, context)
       let config = a:context.source.source__config
       let original_source =
             \ (!has_key(config, 'source') ||
@@ -75,7 +73,6 @@ function! s:make_aliases() abort
       let source.description = alias_source.description
       let source.hooks = {}
       let source.source__original_source = original_source
-      let source.source__args = a:context.source.source__args
 
       " Overwrite hooks.
       if has_key(original_source, 'hooks')
@@ -94,22 +91,12 @@ function! s:make_aliases() abort
       " Overwrite functions.
       for func in keys(filter(copy(original_source),
             \ 'type(v:val) == type(function("type"))'))
-        if func ==# 'complete'
-          let define_function = join([
-                \ 'function! source.' . func . '(args, context, arglead, cmdline, cursorpos)',
-                \ '  let args = self.source__args + a:args',
-                \ '  return self.source__original_source.'
-                \                    . func .
-                \   '(args, a:context, a:arglead, a:cmdline, a:cursorpos)',
-                \ 'endfunction'], "\n")
-        else
-          let define_function = join([
-                \ 'function! source.' . func . '(args, context)',
-                \ '  let args = self.source__args + a:args',
-                \ '  return self.source__original_source.'
-                \                    . func . '(args, a:context)',
-                \ 'endfunction'], "\n")
-        endif
+        let define_function = join([
+              \ 'function! source.' . func . '(args, context)',
+              \ '  let args = a:context.source.source__args + a:args',
+              \ '  return a:context.source.source__original_source.'
+              \                    . func . '(args, a:context)',
+              \ 'endfunction'], "\n")
         execute define_function
       endfor
     endfunction
@@ -120,7 +107,7 @@ function! s:make_aliases() abort
   return aliases
 endfunction
 
-function! s:make_default_description(source_name, args) abort
+function! s:make_default_description(source_name, args)
   let desc = 'alias for "' . a:source_name
   if empty(a:args)
     return desc . '"'

@@ -1,6 +1,7 @@
 "=============================================================================
 " FILE: tab.vim
 " AUTHOR:  Shougo Matsushita <Shougo.Matsu@gmail.com>
+" Last Modified: 22 Apr 2013.
 " License: MIT license  {{{
 "     Permission is hereby granted, free of charge, to any person obtaining
 "     a copy of this software and associated documentation files (the
@@ -26,7 +27,7 @@
 let s:save_cpo = &cpo
 set cpo&vim
 
-function! unite#sources#tab#define() abort "{{{
+function! unite#sources#tab#define() "{{{
   return s:source
 endfunction"}}}
 
@@ -38,7 +39,7 @@ let s:source = {
       \ 'default_kind' : 'tab',
       \}
 
-function! s:source.gather_candidates(args, context) abort "{{{
+function! s:source.gather_candidates(args, context) "{{{
   let list = range(1, tabpagenr('$'))
   let arg = get(a:args, 0, '')
   if arg ==# 'no-current'
@@ -50,7 +51,7 @@ function! s:source.gather_candidates(args, context) abort "{{{
     " Get current window buffer in tabs.
     let bufnr = tabpagebuflist(i)[tabpagewinnr(i) - 1]
 
-    let bufname = unite#util#substitute_path_separator(
+    let bufname = unite#substitute_path_separator(
           \ (i == tabpagenr() ?
           \       bufname('#') : bufname(bufnr)))
     if bufname == ''
@@ -64,7 +65,7 @@ function! s:source.gather_candidates(args, context) abort "{{{
         let title = '[' . title . ']'
       endif
 
-      let cwd = unite#util#substitute_path_separator(
+      let cwd = unite#substitute_path_separator(
             \ (i == tabpagenr() ? getcwd() : gettabvar(i, 'cwd')))
       if cwd !~ '/$'
         let cwd .= '/'
@@ -97,11 +98,16 @@ function! s:source.gather_candidates(args, context) abort "{{{
 
     if len(tabpagebuflist(i)) > 1
       " Get tab windows list.
-      for [winnr, bufnr] in map(tabpagebuflist(i), "[v:key, v:val]")
-        let abbr .= "\n" . printf('%s %d: %s', repeat(' ', 1), (winnr+1),
-              \ (bufname(bufnr) == '' ? '[No Name]' : bufname(bufnr)))
-      endfor
+      let tabnr = tabpagenr()
+      execute 'tabnext' i
+      let abbr .= "\n" . join(map(range(1, winnr('$')),
+            \ "printf('%s %d: %s', repeat(' ', 1), v:val,
+            \ (bufname(winbufnr(v:val)) == '' ?
+            \ '[No Name]' : bufname(winbufnr(v:val))))"), "\n")
+      execute 'tabnext' tabnr
     endif
+    let word = exists('*gettabvar') && gettabvar(i, 'title') != '' ?
+          \ gettabvar(i, 'title') : bufname
 
     call add(candidates, {
           \ 'word' : abbr,
@@ -113,10 +119,10 @@ function! s:source.gather_candidates(args, context) abort "{{{
 
   return candidates
 endfunction"}}}
-function! s:source.complete(args, context, arglead, cmdline, cursorpos) abort "{{{
+function! s:source.complete(args, context, arglead, cmdline, cursorpos) "{{{
   return ['no-current']
 endfunction"}}}
-function! s:source.hooks.on_syntax(args, context) abort "{{{
+function! s:source.hooks.on_syntax(args, context) "{{{
   syntax match uniteSource__Tab_title /\[.\{-}\]/
         \ contained containedin=uniteSource__Tab
   highlight default link uniteSource__Tab_title Function

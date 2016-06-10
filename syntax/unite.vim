@@ -1,6 +1,7 @@
 "=============================================================================
 " FILE: syntax/unite.vim
 " AUTHOR: Shougo Matsushita <Shougo.Matsu@gmail.com>
+" Last Modified: 28 Apr 2013.
 " License: MIT license  {{{
 "     Permission is hereby granted, free of charge, to any person obtaining
 "     a copy of this software and associated documentation files (the
@@ -32,13 +33,19 @@ endif
 let s:save_cpo = &cpo
 set cpo&vim
 
+syntax match uniteQuickMatchLine /^.|.*/
+      \ contains=uniteQuickMatchTrigger,uniteCandidateSourceName,uniteCandidateAbbr
+syntax region uniteNonMarkedLine start=/^- / end='$' keepend
+      \ contains=uniteCandidateMarker,uniteCandidateSourceName,uniteCandidateAbbr
+syntax match uniteCandidateMarker /^- / contained
+syntax match uniteQuickMatchTrigger /^.|/ contained
+
 highlight default link uniteError  Error
 
+highlight default link uniteQuickMatchTrigger  Special
 highlight default link uniteMarkedLine  Statement
 highlight default link uniteCandidateSourceName  Type
-highlight default link uniteQuickMatchText  Special
-highlight default link uniteCandidateIcon  Special
-highlight default link uniteMarkedIcon  Statement
+highlight default link uniteCandidateMarker  Special
 highlight default link uniteCandidateInputKeyword  Function
 
 " The following definitions are for <Plug>(unite-choose-action).
@@ -49,20 +56,13 @@ highlight default link uniteChooseMessage  NONE
 highlight default link uniteChoosePrompt  uniteSourcePrompt
 highlight default link uniteChooseSource  uniteSourceNames
 
-highlight default link uniteInputPrompt  Normal
-highlight default link uniteInputLine  Identifier
-highlight default link uniteInputCommand  Statement
-
-highlight default link uniteStatusNormal  StatusLine
-highlight default link uniteStatusHead  Statement
-highlight default link uniteStatusSourceNames  PreProc
-highlight default link uniteStatusSourceCandidates  Constant
-highlight default link uniteStatusMessage  Comment
-highlight default link uniteStatusLineNR  LineNR
+highlight default link uniteInputPrompt  Identifier
+highlight default link uniteInputPromptError  Error
+highlight default link uniteInputSpecial  Special
 
 let b:current_syntax = 'unite'
 
-call unite#view#_set_syntax()
+call unite#set_highlight()
 
 let &cpo = s:save_cpo
 unlet s:save_cpo

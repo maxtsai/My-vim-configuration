@@ -1,6 +1,7 @@
 "=============================================================================
 " FILE: runtimepath.vim
 " AUTHOR:  Shougo Matsushita <Shougo.Matsu@gmail.com>
+" Last Modified: 24 Mar 2013.
 " License: MIT license  {{{
 "     Permission is hereby granted, free of charge, to any person obtaining
 "     a copy of this software and associated documentation files (the
@@ -29,7 +30,7 @@ set cpo&vim
 " Variables  "{{{
 "}}}
 
-function! unite#sources#runtimepath#define() abort "{{{
+function! unite#sources#runtimepath#define() "{{{
   return s:source
 endfunction"}}}
 
@@ -41,12 +42,13 @@ let s:source = {
       \ 'action_table' : {},
       \ }
 
-function! s:source.gather_candidates(args, context) abort "{{{
+function! s:source.gather_candidates(args, context) "{{{
   return map(map(s:split_rtp(), 'unite#util#expand(v:val)'), "{
         \ 'word' : unite#util#expand(v:val),
         \ 'abbr' : unite#util#substitute_path_separator(
         \         fnamemodify(unite#util#expand(v:val), ':~')),
         \ 'action__path' : unite#util#expand(v:val),
+        \ 'action__directory' : unite#util#expand(v:val),
         \ 'source__runtimepath' : v:val,
         \ }")
 endfunction"}}}
@@ -58,14 +60,14 @@ let s:source.action_table.delete = {
       \ 'is_quit' : 0,
       \ 'is_selectable' : 1,
       \ }
-function! s:source.action_table.delete.func(candidates) abort "{{{
+function! s:source.action_table.delete.func(candidates) "{{{
   for candidate in a:candidates
     execute 'set runtimepath-=' . fnameescape(candidate.action__path)
   endfor
 endfunction"}}}
 "}}}
 
-function! s:split_rtp(...) abort "{{{
+function! s:split_rtp(...) "{{{
   let rtp = a:0 ? a:1 : &runtimepath
   if type(rtp) == type([])
     return rtp

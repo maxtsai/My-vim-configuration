@@ -1,6 +1,7 @@
 "=============================================================================
 " FILE: bookmark.vim
 " AUTHOR:  Shougo Matsushita <Shougo.Matsu@gmail.com>
+" Last Modified: 20 Aug 2010
 " License: MIT license  {{{
 "     Permission is hereby granted, free of charge, to any person obtaining
 "     a copy of this software and associated documentation files (the
@@ -23,24 +24,21 @@
 " }}}
 "=============================================================================
 
-let s:save_cpo = &cpo
-set cpo&vim
-
 if exists('g:loaded_unite_source_bookmark')
-      \ || ($SUDO_USER != '' && $USER !=# $SUDO_USER
-      \     && $HOME !=# expand('~'.$USER)
-      \     && $HOME ==# expand('~'.$SUDO_USER))
+      \ || $SUDO_USER != ''
   finish
 endif
 
-command! -nargs=? -complete=file UniteBookmarkAdd
-      \ call unite#sources#bookmark#_append(<q-args>)
+let s:save_cpo = &cpo
+set cpo&vim
+
+command! -nargs=? -complete=file UniteBookmarkAdd call unite#sources#bookmark#_append(<q-args>)
 
 " Add custom action table. "{{{
 let s:file_bookmark_action = {
       \ 'description' : 'append files to bookmark list',
       \ }
-function! s:file_bookmark_action.func(candidate) abort "{{{
+function! s:file_bookmark_action.func(candidate) "{{{
   " Add to bookmark.
   call unite#sources#bookmark#_append(a:candidate.action__path)
 endfunction"}}}
@@ -48,7 +46,7 @@ endfunction"}}}
 let s:buffer_bookmark_action = {
       \ 'description' : 'append buffers to bookmark list',
       \ }
-function! s:buffer_bookmark_action.func(candidate) abort "{{{
+function! s:buffer_bookmark_action.func(candidate) "{{{
   let filetype = getbufvar(
         \ a:candidate.action__buffer_nr, '&filetype')
   if filetype ==# 'vimfiler'
@@ -65,8 +63,8 @@ function! s:buffer_bookmark_action.func(candidate) abort "{{{
   call unite#sources#bookmark#_append(filename)
 endfunction"}}}
 
-call unite#custom#action('file', 'bookmark', s:file_bookmark_action)
-call unite#custom#action('buffer', 'bookmark', s:buffer_bookmark_action)
+call unite#custom_action('file', 'bookmark', s:file_bookmark_action)
+call unite#custom_action('buffer', 'bookmark', s:buffer_bookmark_action)
 unlet! s:file_bookmark_action
 unlet! s:buffer_bookmark_action
 "}}}

@@ -1,6 +1,7 @@
 "=============================================================================
 " FILE: converter_relative_word.vim
 " AUTHOR:  Shougo Matsushita <Shougo.Matsu@gmail.com>
+" Last Modified: 09 May 2013.
 " License: MIT license  {{{
 "     Permission is hereby granted, free of charge, to any person obtaining
 "     a copy of this software and associated documentation files (the
@@ -26,7 +27,7 @@
 let s:save_cpo = &cpo
 set cpo&vim
 
-function! unite#filters#converter_relative_word#define() abort "{{{
+function! unite#filters#converter_relative_word#define() "{{{
   return s:converter
 endfunction"}}}
 
@@ -35,28 +36,17 @@ let s:converter = {
       \ 'description' : 'relative path word converter',
       \}
 
-function! s:converter.filter(candidates, context) abort "{{{
-  if a:context.input =~ '^\%(/\|\a\+:/\)'
-    " Use full path.
-    return unite#filters#converter_full_path#define().filter(
-          \ a:candidates, a:context)
-  endif
-
+function! s:converter.filter(candidates, context) "{{{
   try
     let directory = unite#util#substitute_path_separator(getcwd())
-    let old_dir = directory
     if has_key(a:context, 'source__directory')
+      let old_dir = directory
       let directory = substitute(a:context.source__directory, '*', '', 'g')
 
       if directory !=# old_dir && isdirectory(directory)
             \ && a:context.input == ''
-        call unite#util#lcd(directory)
+        lcd `=directory`
       endif
-    endif
-
-    if unite#util#has_lua()
-      return unite#filters#converter_relative_word#lua(
-            \ a:candidates, directory)
     endif
 
     for candidate in a:candidates
@@ -67,34 +57,9 @@ function! s:converter.filter(candidates, context) abort "{{{
   finally
     if has_key(a:context, 'source__directory')
           \ && directory !=# old_dir
-      call unite#util#lcd(old_dir)
+      lcd `=old_dir`
     endif
   endtry
-
-  return a:candidates
-endfunction"}}}
-
-function! unite#filters#converter_relative_word#lua(candidates, cwd) abort "{{{
-  let cwd = a:cwd
-  if cwd != '/' && cwd[-1:] != '/'
-    let cwd .= '/'
-  endif
-
-  lua << EOF
-  do
-  local candidates = vim.eval('a:candidates')
-  local cwd = vim.eval('cwd')
-  local home = vim.eval('unite#util#substitute_path_separator(expand("~/"))')
-  for candidate in candidates() do
-    local path = candidate.action__path or candidate.word
-    if path:find(cwd, 1, true) == 1 then
-      candidate.word = path:sub(cwd:len() + 1)
-    elseif path:find(home, 1, true) == 1 then
-      candidate.word = path:sub(home:len() + 1)
-    end
-  end
-end
-EOF
 
   return a:candidates
 endfunction"}}}

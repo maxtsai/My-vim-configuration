@@ -1,6 +1,7 @@
 "=============================================================================
 " FILE: converter_relative_abbr.vim
 " AUTHOR:  Shougo Matsushita <Shougo.Matsu@gmail.com>
+" Last Modified: 09 May 2013.
 " License: MIT license  {{{
 "     Permission is hereby granted, free of charge, to any person obtaining
 "     a copy of this software and associated documentation files (the
@@ -26,7 +27,7 @@
 let s:save_cpo = &cpo
 set cpo&vim
 
-function! unite#filters#converter_relative_abbr#define() abort "{{{
+function! unite#filters#converter_relative_abbr#define() "{{{
   return s:converter
 endfunction"}}}
 
@@ -35,18 +36,17 @@ let s:converter = {
       \ 'description' : 'relative path abbr converter',
       \}
 
-function! s:converter.filter(candidates, context) abort "{{{
+function! s:converter.filter(candidates, context) "{{{
   try
     let directory = unite#util#substitute_path_separator(getcwd())
-    let old_dir = directory
-
     if has_key(a:context, 'source__directory')
+      let old_dir = directory
       let directory = substitute(
             \ a:context.source__directory, '*', '', 'g')
 
       if directory !=# old_dir && isdirectory(directory)
             \ && a:context.input == ''
-        call unite#util#lcd(directory)
+        lcd `=directory`
       endif
     endif
 
@@ -54,18 +54,11 @@ function! s:converter.filter(candidates, context) abort "{{{
       let candidate.abbr = unite#util#substitute_path_separator(
             \ fnamemodify(get(candidate, 'action__path',
             \     candidate.word), ':~:.'))
-      if candidate.abbr == ''
-        let candidate.abbr = get(candidate, 'action__path',
-              \     candidate.word)
-      endif
-      if isdirectory(candidate.abbr)
-        let candidate.abbr .= '/'
-      endif
     endfor
   finally
     if has_key(a:context, 'source__directory')
           \ && directory !=# old_dir
-      call unite#util#lcd(old_dir)
+      lcd `=old_dir`
     endif
   endtry
 

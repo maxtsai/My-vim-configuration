@@ -1,6 +1,7 @@
 "=============================================================================
 " FILE: buffer.vim
 " AUTHOR:  Shougo Matsushita <Shougo.Matsu@gmail.com>
+" Last Modified: 08 Feb 2012.
 " License: MIT license  {{{
 "     Permission is hereby granted, free of charge, to any person obtaining
 "     a copy of this software and associated documentation files (the
@@ -26,7 +27,7 @@
 let s:save_cpo = &cpo
 set cpo&vim
 
-function! unite#kinds#buffer#define() abort "{{{
+function! unite#kinds#buffer#define() "{{{
   return s:kind
 endfunction"}}}
 
@@ -42,7 +43,7 @@ let s:kind.action_table.open = {
       \ 'description' : 'open buffer',
       \ 'is_selectable' : 1,
       \ }
-function! s:kind.action_table.open.func(candidates) abort "{{{
+function! s:kind.action_table.open.func(candidates) "{{{
   for candidate in a:candidates
     execute 'buffer' candidate.action__buffer_nr
   endfor
@@ -51,7 +52,7 @@ endfunction"}}}
 let s:kind.action_table.goto = {
       \ 'description' : 'goto buffer tab',
       \ }
-function! s:kind.action_table.goto.func(candidate) abort "{{{
+function! s:kind.action_table.goto.func(candidate) "{{{
   for i in range(tabpagenr('$'))
     let tabnr = i + 1
     for nr in tabpagebuflist(tabnr)
@@ -73,7 +74,7 @@ let s:kind.action_table.delete = {
       \ 'is_quit' : 0,
       \ 'is_selectable' : 1,
       \ }
-function! s:kind.action_table.delete.func(candidates) abort "{{{
+function! s:kind.action_table.delete.func(candidates) "{{{
   for candidate in a:candidates
     call s:delete('bdelete', candidate)
   endfor
@@ -85,7 +86,7 @@ let s:kind.action_table.fdelete = {
       \ 'is_quit' : 0,
       \ 'is_selectable' : 1,
       \ }
-function! s:kind.action_table.fdelete.func(candidates) abort "{{{
+function! s:kind.action_table.fdelete.func(candidates) "{{{
   for candidate in a:candidates
     call s:delete('bdelete!', candidate)
   endfor
@@ -97,7 +98,7 @@ let s:kind.action_table.wipeout = {
       \ 'is_quit' : 0,
       \ 'is_selectable' : 1,
       \ }
-function! s:kind.action_table.wipeout.func(candidates) abort "{{{
+function! s:kind.action_table.wipeout.func(candidates) "{{{
   for candidate in a:candidates
     call s:delete('bwipeout', candidate)
   endfor
@@ -109,7 +110,7 @@ let s:kind.action_table.unload = {
       \ 'is_quit' : 0,
       \ 'is_selectable' : 1,
       \ }
-function! s:kind.action_table.unload.func(candidates) abort "{{{
+function! s:kind.action_table.unload.func(candidates) "{{{
   for candidate in a:candidates
     call s:delete('unload', candidate)
   endfor
@@ -119,8 +120,8 @@ let s:kind.action_table.preview = {
       \ 'description' : 'preview buffer',
       \ 'is_quit' : 0,
       \ }
-function! s:kind.action_table.preview.func(candidate) abort "{{{
-  call unite#view#_preview_file(a:candidate.action__path)
+function! s:kind.action_table.preview.func(candidate) "{{{
+  pedit `=a:candidate.action__path`
 
   let filetype = getbufvar(a:candidate.action__buffer_nr, '&filetype')
   if filetype != ''
@@ -137,7 +138,7 @@ let s:kind.action_table.rename = {
       \ 'is_quit' : 0,
       \ 'is_selectable' : 1,
       \ }
-function! s:kind.action_table.rename.func(candidates) abort "{{{
+function! s:kind.action_table.rename.func(candidates) "{{{
   for candidate in a:candidates
     if getbufvar(candidate.action__buffer_nr, '&buftype') =~ 'nofile'
       " Skip nofile buffer.
@@ -156,7 +157,7 @@ endfunction"}}}
 "}}}
 
 " Misc
-function! s:delete(delete_command, candidate) abort "{{{
+function! s:delete(delete_command, candidate) "{{{
   " Not to close window, move to alternate buffer.
 
   let winnr = 1

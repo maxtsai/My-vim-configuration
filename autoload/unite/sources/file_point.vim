@@ -1,6 +1,7 @@
 "=============================================================================
 " FILE: file_point.vim
 " AUTHOR:  Shougo Matsushita <Shougo.Matsu@gmail.com>
+" Last Modified: 16 Oct 2012.
 " License: MIT license  {{{
 "     Permission is hereby granted, free of charge, to any person obtaining
 "     a copy of this software and associated documentation files (the
@@ -26,7 +27,7 @@
 let s:save_cpo = &cpo
 set cpo&vim
 
-function! unite#sources#file_point#define() abort "{{{
+function! unite#sources#file_point#define() "{{{
   return s:source
 endfunction"}}}
 
@@ -35,7 +36,7 @@ let s:source = {
       \ 'description' : 'file candidate from cursor point',
       \ 'hooks' : {},
       \}
-function! s:source.hooks.on_init(args, context) abort "{{{
+function! s:source.hooks.on_init(args, context) "{{{
   let filename_pattern = '[[:alnum:];/?:@&=+$_.!~|()#-]\+'
   let filename = unite#util#expand(
         \ matchstr(getline('.')[: col('.')-1], filename_pattern . '$')
@@ -45,7 +46,7 @@ function! s:source.hooks.on_init(args, context) abort "{{{
         \ filename : fnamemodify(filename, ':p')
 endfunction"}}}
 
-function! s:source.gather_candidates(args, context) abort "{{{
+function! s:source.gather_candidates(args, context) "{{{
   if a:context.source__filename =~ '^\%(https\?\|ftp\)://'
     if exists('*vimproc#host_exists') &&
           \ !vimproc#host_exists(a:context.source__filename)
@@ -56,7 +57,7 @@ function! s:source.gather_candidates(args, context) abort "{{{
     " URI.
     return [{
           \   'word' : a:context.source__filename,
-          \   'kind' : ['file', 'uri'],
+          \   'kind' : 'uri',
           \   'action__path' : a:context.source__filename,
           \ }]
   elseif filereadable(a:context.source__filename)
@@ -64,6 +65,8 @@ function! s:source.gather_candidates(args, context) abort "{{{
           \   'word' : a:context.source__filename,
           \   'kind' : 'file',
           \   'action__path' : a:context.source__filename,
+          \   'action__directory' : unite#util#path2directory(
+          \               a:context.source__filename),
           \ }]
   else
     " File not found.

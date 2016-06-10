@@ -125,8 +125,6 @@ nnoremap <C-b> :Unite buffer<CR>
 " print debug comment
 let @d="printk(\"### \%s:\%d\\n\", __func__, __LINE__);"
 
-let g:unite_data_directory = $HOME.'/.vim/unite/'
-
 "Most recently used
 let MRU_Max_Entries = 200
 
