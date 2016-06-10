@@ -1,7 +1,6 @@
 "=============================================================================
 " FILE: completion.vim
 " AUTHOR:  Shougo Matsushita <Shougo.Matsu@gmail.com>
-" Last Modified: 24 Jan 2013.
 " License: MIT license  {{{
 "     Permission is hereby granted, free of charge, to any person obtaining
 "     a copy of this software and associated documentation files (the
@@ -27,7 +26,7 @@
 let s:save_cpo = &cpo
 set cpo&vim
 
-function! unite#kinds#completion#define() "{{{
+function! unite#kinds#completion#define() abort "{{{
   return s:kind
 endfunction"}}}
 
@@ -41,17 +40,17 @@ let s:kind = {
 let s:kind.action_table.insert = {
       \ 'description' : 'insert word',
       \ }
-function! s:kind.action_table.insert.func(candidate) "{{{
+function! s:kind.action_table.insert.func(candidate) abort "{{{
   call unite#kinds#common#insert_word(
         \ a:candidate.action__complete_word,
-        \ { 'pos' : a:candidate.action__complete_pos})
+        \ { 'col' : a:candidate.action__complete_pos})
 endfunction"}}}
 
 let s:kind.action_table.preview = {
       \ 'description' : 'preview word in echo area',
       \ 'is_quit' : 0,
       \ }
-function! s:kind.action_table.preview.func(candidate) "{{{
+function! s:kind.action_table.preview.func(candidate) abort "{{{
   echo ''
   redraw
 
@@ -61,7 +60,7 @@ function! s:kind.action_table.preview.func(candidate) "{{{
         \ a:candidate.action__complete_info_lazy() :
         \ ''
   if complete_info != ''
-    let S = vital#of('unite.vim').import('Data.String')
+    let S = unite#util#get_vital().import('Data.String')
     echo join(S.wrap(complete_info)[: &cmdheight-1], "\n")
   endif
 endfunction"}}}

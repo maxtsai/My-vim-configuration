@@ -1,7 +1,6 @@
 "=============================================================================
 " FILE: matcher_glob.vim
 " AUTHOR:  Shougo Matsushita <Shougo.Matsu@gmail.com>
-" Last Modified: 08 Apr 2013.
 " License: MIT license  {{{
 "     Permission is hereby granted, free of charge, to any person obtaining
 "     a copy of this software and associated documentation files (the
@@ -27,7 +26,7 @@
 let s:save_cpo = &cpo
 set cpo&vim
 
-function! unite#filters#matcher_glob#define() "{{{
+function! unite#filters#matcher_glob#define() abort "{{{
   return s:matcher
 endfunction"}}}
 
@@ -36,9 +35,14 @@ let s:matcher = {
       \ 'description' : 'glob matcher',
       \}
 
-function! s:matcher.filter(candidates, context) "{{{
+function! s:matcher.pattern(input) abort "{{{
+  return substitute(unite#util#escape_match(a:input),
+          \ '\\\@<!|', '\\|', 'g')
+endfunction"}}}
+
+function! s:matcher.filter(candidates, context) abort "{{{
   if a:context.input == ''
-    return unite#util#filter_matcher(
+    return unite#filters#filter_matcher(
           \ a:candidates, '', a:context)
   endif
 
@@ -51,8 +55,8 @@ function! s:matcher.filter(candidates, context) "{{{
   return candidates
 endfunction"}}}
 
-function! unite#filters#matcher_glob#glob_matcher(candidates, input, context) "{{{
-  let input = substitute(a:input, '\\ ', ' ', 'g')
+function! unite#filters#matcher_glob#glob_matcher(candidates, input, context) abort "{{{
+  let input = a:input
 
   if input =~ '^!'
     if input == '!'
@@ -60,16 +64,20 @@ function! unite#filters#matcher_glob#glob_matcher(candidates, input, context) "{
     endif
 
     " Exclusion.
-    let input = substitute(unite#escape_match(input),
+    let input = substitute(unite#util#escape_match(input),
           \ '\\\@<!|', '\\|', 'g')
     let expr = 'v:val.word !~ ' . string(input[1:])
+  elseif input =~ '^:'
+    " Executes command.
+    let a:context.execute_command = input[1:]
+    return a:candidates
   elseif input =~ '\\\@<![*|]'
     " Wildcard(*) or OR(|).
-    let input = substitute(unite#escape_match(input),
-          \ '\\\@<!|', '\\|', 'g')
+    let input = s:matcher.pattern(input)
     let expr = 'v:val.word =~ ' . string(input)
   elseif unite#util#has_lua()
     let expr = 'if_lua'
+    let a:context.input_lua = input
   else
     let input = substitute(input, '\\\(.\)', '\1', 'g')
     let expr = &ignorecase ?
@@ -79,7 +87,7 @@ function! unite#filters#matcher_glob#glob_matcher(candidates, input, context) "{
           \     string(input))
   endif
 
-  return unite#util#filter_matcher(a:candidates, expr, a:context)
+  return unite#filters#filter_matcher(a:candidates, expr, a:context)
 endfunction"}}}
 
 let &cpo = s:save_cpo

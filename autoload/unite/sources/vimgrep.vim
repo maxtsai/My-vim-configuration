@@ -1,7 +1,6 @@
 "=============================================================================
 " FILE: vimgrep.vim
 " AUTHOR:  Shougo Matsushita <Shougo.Matsu at gmail.com>
-" Last Modified: 29 Apr 2013.
 " License: MIT license  {{{
 "     Permission is hereby granted, free of charge, to any person obtaining
 "     a copy of this software and associated documentation files (the
@@ -27,42 +26,9 @@
 " Variables  "{{{
 call unite#util#set_default(
       \ 'g:unite_source_vimgrep_search_word_highlight', 'Search')
-call unite#util#set_default('g:unite_source_vimgrep_ignore_pattern',
-      \'\~$\|\.\%(o\|exe\|dll\|bak\|sw[po]\)$\|'.
-      \'\%(^\|/\)\.\%(hg\|git\|bzr\|svn\)\%($\|/\)\|'.
-      \'\%(^\|/\)tags\%(-\a*\)\?$')
 "}}}
 
-" Actions "{{{
-let s:action_vimgrep_file = {
-  \   'description': 'vimgrep this files',
-  \   'is_quit': 1,
-  \   'is_invalidate_cache': 1,
-  \   'is_selectable': 1,
-  \   'is_start' : 1,
-  \ }
-function! s:action_vimgrep_file.func(candidates) "{{{
-  call unite#start_script([
-        \ ['vimgrep', map(copy(a:candidates),
-        \ 'string(substitute(v:val.action__path, "/$", "", "g"))'),
-        \ ]], { 'no_quit' : 1 })
-endfunction "}}}
-
-let s:action_vimgrep_directory = {
-  \   'description': 'vimgrep this directories',
-  \   'is_quit': 1,
-  \   'is_invalidate_cache': 1,
-  \   'is_selectable': 1,
-  \   'is_start' : 1,
-  \ }
-function! s:action_vimgrep_directory.func(candidates) "{{{
-  call unite#start_script([
-        \ ['vimgrep', map(copy(a:candidates), 'string(v:val.action__directory)'),
-        \ ]], { 'no_quit' : 1 })
-endfunction "}}}
-" }}}
-
-function! unite#sources#vimgrep#define() "{{{
+function! unite#sources#vimgrep#define() abort "{{{
   return s:source
 endfunction "}}}
 
@@ -72,76 +38,81 @@ let s:source = {
       \ 'hooks' : {},
       \ 'syntax' : 'uniteSource__Vimgrep',
       \ 'matchers' : 'matcher_regexp',
-      \ 'ignore_pattern' : g:unite_source_vimgrep_ignore_pattern,
+      \ 'ignore_globs' : [
+      \         '*~', '*.o', '*.exe', '*.bak',
+      \         'DS_Store', '*.pyc', '*.sw[po]', '*.class',
+      \         '.hg/**', '.git/**', '.bzr/**', '.svn/**',
+      \ ],
       \ }
 
-function! s:source.hooks.on_init(args, context) "{{{
-  if type(get(a:args, 0, '')) == type([])
-    let a:context.source__target = a:args[0]
-    let targets = a:context.source__target
-  else
-    let default = get(a:args, 0, '')
+function! s:source.hooks.on_init(args, context) abort "{{{
+  let args = unite#helper#parse_source_args(a:args)
 
-    if default == ''
-      let default = '**'
-    endif
-
-    if type(get(a:args, 0, '')) == type('')
-          \ && get(a:args, 0, '') == ''
-      let target = unite#util#substitute_path_separator(
-            \ unite#util#input('Target: ', default, 'file'))
-    else
-      let target = default
-    endif
-
-    " Escape filename.
-    let target = escape(target, ' ')
-
-    let a:context.source__target = [target]
-
-    let targets = map(filter(split(target), 'v:val !~ "^-"'),
-          \ 'substitute(v:val, "*\\+$", "", "")')
+  let target = get(args, 0, '')
+  if target == ''
+    let target = unite#helper#parse_source_path(
+      \ unite#util#substitute_path_separator(
+        \ unite#util#input('Target: ', '**', 'file')))
   endif
 
-  let a:context.source__input = get(a:args, 1, '')
-  if a:context.source__input == ''
-    let a:context.source__input = unite#util#input('Pattern: ')
+  if target == '%'
+    let target = unite#util#substitute_path_separator(
+          \ bufname(unite#get_current_unite().prev_bufnr))
+  endif
+
+  let a:context.source__targets = split(target, "\n")
+
+  let a:context.source__input = get(args, 1, '')
+  if a:context.source__input == '' || a:context.unite__is_restart
+    let a:context.source__input = unite#util#input('Pattern: ',
+          \ a:context.source__input,
+          \ 'customlist,unite#helper#complete_search_history')
   endif
 
   let a:context.source__directory =
-        \ (len(targets) == 1) ?
+        \ (len(a:context.source__targets) == 1) ?
         \ unite#util#substitute_path_separator(
-        \  unite#util#expand(targets[0])) : ''
+        \  unite#util#expand(a:context.source__targets[0])) : ''
 endfunction"}}}
-function! s:source.hooks.on_syntax(args, context) "{{{
+function! s:source.hooks.on_syntax(args, context) abort "{{{
   syntax case ignore
-  execute 'syntax match uniteSource__VimgrepPattern /:.*\zs'
+  syntax region uniteSource__VimgrepLine
+        \ start=' ' end='$'
+        \ containedin=uniteSource__Vimgrep
+  syntax match uniteSource__VimgrepFile /^[^:]*/ contained
+        \ containedin=uniteSource__VimgrepLine
+        \ nextgroup=uniteSource__VimgrepSeparator
+  syntax match uniteSource__VimgrepSeparator /:/ contained
+        \ containedin=uniteSource__VimgrepLine
+        \ nextgroup=uniteSource__VimgrepLineNr
+  syntax match uniteSource__VimgrepLineNr /\d\+\ze:/ contained
+        \ containedin=uniteSource__VimgrepLine
+        \ nextgroup=uniteSource__VimgrepPattern
+  execute 'syntax match uniteSource__VimgrepPattern /'
         \ . substitute(a:context.source__input, '\([/\\]\)', '\\\1', 'g')
-        \ . '/ contained containedin=uniteSource__Vimgrep'
+        \ . '/ contained containedin=uniteSource__VimgrepLine'
+  highlight default link uniteSource__VimgrepFile Directory
+  highlight default link uniteSource__VimgrepLineNr LineNR
   execute 'highlight default link uniteSource__VimgrepPattern'
         \ g:unite_source_vimgrep_search_word_highlight
 endfunction"}}}
-function! s:source.hooks.on_post_filter(args, context) "{{{
+function! s:source.hooks.on_post_filter(args, context) abort "{{{
   for candidate in a:context.candidates
     let candidate.kind = ['file', 'jump_list']
-    let candidate.action__directory =
-          \ unite#util#path2directory(candidate.action__path)
+    let candidate.action__col_pattern = a:context.source__input
     let candidate.is_multiline = 1
   endfor
 endfunction"}}}
 
-function! s:source.gather_candidates(args, context) "{{{
-  if empty(a:context.source__target)
+function! s:source.gather_candidates(args, context) abort "{{{
+  if empty(a:context.source__targets)
         \ || a:context.source__input == ''
-    call unite#print_source_message('Completed.', s:source.name)
     return []
   endif
 
-  let cmdline = printf('vimgrep /%s/j %s',
+  let cmdline = printf('silent vimgrep /%s/j %s',
     \   escape(a:context.source__input, '/'),
-    \   join(map(a:context.source__target,
-    \           "substitute(v:val, '/$', '', '')")),
-    \)
+    \   join(map(copy(a:context.source__targets), 'escape(v:val, " ")')))
 
   call unite#print_source_message(
         \ 'Command-line: ' . cmdline, s:source.name)
@@ -153,12 +124,8 @@ function! s:source.gather_candidates(args, context) "{{{
     execute cmdline
     let qflist = getqflist()
 
-    call unite#print_source_message('Completed.', s:source.name)
-
-    if isdirectory(a:context.source__directory)
-      let cwd = getcwd()
-      lcd `=a:context.source__directory`
-    endif
+    let cwd = getcwd()
+    call unite#util#lcd(a:context.source__directory)
 
     for qf in filter(qflist,
           \ "v:val.bufnr != '' && bufname(v:val.bufnr) != ''")
@@ -177,11 +144,10 @@ function! s:source.gather_candidates(args, context) "{{{
     endfor
 
     if isdirectory(a:context.source__directory)
-      lcd `=cwd`
+      call unite#util#lcd(cwd)
     endif
   catch /^Vim\%((\a\+)\)\?:E480/
     " Ignore.
-    call unite#print_source_message('Completed.', s:source.name)
     return []
   finally
     " Delete unlisted buffers.
@@ -193,12 +159,14 @@ function! s:source.gather_candidates(args, context) "{{{
 
     " Clear qflist.
     call setqflist([])
+
+    cclose
   endtry
 
   return _
 endfunction "}}}
 
-function! s:source.complete(args, context, arglead, cmdline, cursorpos) "{{{
+function! s:source.complete(args, context, arglead, cmdline, cursorpos) abort "{{{
   return unite#sources#file#complete_directory(
         \ a:args, a:context, a:arglead, a:cmdline, a:cursorpos)
 endfunction"}}}

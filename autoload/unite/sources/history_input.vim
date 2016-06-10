@@ -1,7 +1,6 @@
 "=============================================================================
 " FILE: history_input.vim
 " AUTHOR:  Shougo Matsushita <Shougo.Matsu at gmail.com>
-" Last Modified: 24 Jan 2013.
 " License: MIT license  {{{
 "     Permission is hereby granted, free of charge, to any person obtaining
 "     a copy of this software and associated documentation files (the
@@ -27,7 +26,7 @@
 let s:save_cpo = &cpo
 set cpo&vim
 
-function! unite#sources#history_input#define()
+function! unite#sources#history_input#define() abort
   return s:source
 endfunction
 
@@ -39,10 +38,10 @@ let s:source = {
       \ 'is_listed' : 0,
       \}
 
-function! s:source.gather_candidates(args, context) "{{{
+function! s:source.gather_candidates(args, context) abort "{{{
   let context = unite#get_context()
   let inputs = unite#get_profile(
-        \ context.old_buffer_info[0].profile_name, 'unite__inputs')
+        \ context.unite__old_buffer_info[0].profile_name, 'unite__inputs')
   let key = context.old_source_names_string
   if !has_key(inputs, key)
     return []
@@ -58,9 +57,9 @@ let s:source.action_table.narrow = {
       \ 'description' : 'narrow by history',
       \ 'is_quit' : 0,
       \ }
-function! s:source.action_table.narrow.func(candidate) "{{{
+function! s:source.action_table.narrow.func(candidate) abort "{{{
   call unite#force_quit_session()
-  call unite#mappings#narrowing(a:candidate.word)
+  call unite#mappings#narrowing(a:candidate.word, 0)
 endfunction"}}}
 
 let s:source.action_table.delete = {
@@ -69,10 +68,10 @@ let s:source.action_table.delete = {
       \ 'is_quit' : 0,
       \ 'is_invalidate_cache' : 1,
       \ }
-function! s:source.action_table.delete.func(candidates) "{{{
+function! s:source.action_table.delete.func(candidates) abort "{{{
   let context = unite#get_context()
   let inputs = unite#get_profile(
-        \ context.old_buffer_info[0].profile_name, 'unite__inputs')
+        \ context.unite__old_buffer_info[0].profile_name, 'unite__inputs')
   let key = context.old_source_names_string
   if !has_key(inputs, key)
     return

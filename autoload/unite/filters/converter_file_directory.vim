@@ -2,7 +2,6 @@
 " FILE: converter_file_directory.vim
 " AUTHOR:  Shougo Matsushita <Shougo.Matsu (at) gmail.com>
 "          basyura <basyura (at) gmail.com>
-" Last Modified: 10 May 2013.
 " License: MIT license  {{{
 "     Permission is hereby granted, free of charge, to any person obtaining
 "     a copy of this software and associated documentation files (the
@@ -28,7 +27,7 @@
 let s:save_cpo = &cpo
 set cpo&vim
 
-function! unite#filters#converter_file_directory#define() "{{{
+function! unite#filters#converter_file_directory#define() abort "{{{
   return s:converter
 endfunction"}}}
 
@@ -37,11 +36,11 @@ let s:converter = {
       \ 'description' : 'converter to separate file and directory',
       \}
 
-function! s:converter.filter(candidates, context)
+function! s:converter.filter(candidates, context) abort
   let candidates = copy(a:candidates)
 
   let max = min([max(map(copy(candidates), "
-        \ unite#util#wcswidth(s:convert_to_abbr(
+        \ strwidth(s:convert_to_abbr(
         \  get(v:val, 'action__path', v:val.word)))"))+2,
         \ get(g:, 'unite_converter_file_directory_width', 45)])
 
@@ -61,7 +60,7 @@ function! s:converter.filter(candidates, context)
   return candidates
 endfunction
 
-function! s:convert_to_abbr(path)
+function! s:convert_to_abbr(path) abort
   return printf('%s (%s)', fnamemodify(a:path, ':p:t'),
         \ fnamemodify(a:path, ':p:h:t'))
 endfunction

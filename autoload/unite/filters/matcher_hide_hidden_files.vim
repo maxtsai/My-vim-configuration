@@ -1,7 +1,6 @@
 "=============================================================================
 " FILE: matcher_hide_hidden_files.vim
 " AUTHOR:  Shougo Matsushita <Shougo.Matsu@gmail.com>
-" Last Modified: 10 Aug 2012.
 " License: MIT license  {{{
 "     Permission is hereby granted, free of charge, to any person obtaining
 "     a copy of this software and associated documentation files (the
@@ -27,7 +26,7 @@
 let s:save_cpo = &cpo
 set cpo&vim
 
-function! unite#filters#matcher_hide_hidden_files#define() "{{{
+function! unite#filters#matcher_hide_hidden_files#define() abort "{{{
   return s:matcher
 endfunction"}}}
 
@@ -36,14 +35,17 @@ let s:matcher = {
       \ 'description' : 'hide hidden files matcher',
       \}
 
-function! s:matcher.filter(candidates, context) "{{{
+function! s:matcher.filter(candidates, context) abort "{{{
   if stridx(a:context.input, '.') >= 0
-        \ || get(a:context, 'source__directory', '') =~ '/\.\|^\.'
-    return unite#util#filter_matcher(
-          \ a:candidates, '', a:context)
+    return a:candidates
   endif
 
-  return filter(a:candidates, "v:val.action__path !~ '/\\.\\|^\\.'")
+  return unite#util#has_lua() ?
+        \ unite#filters#lua_filter_patterns(a:candidates,
+        \   ['^%.[^/]*/?$', '/%.[^/]*/?$'], []) :
+        \ filter(a:candidates, "
+        \   has_key(v:val, 'action__path')
+        \    && v:val.action__path !~ '\\%(^\\|/\\)\\.[^/]*/\\?$'")
 endfunction"}}}
 
 let &cpo = s:save_cpo

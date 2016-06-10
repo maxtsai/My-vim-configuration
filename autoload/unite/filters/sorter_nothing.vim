@@ -1,7 +1,6 @@
 "=============================================================================
 " FILE: sorter_nothing.vim
 " AUTHOR:  Shougo Matsushita <Shougo.Matsu@gmail.com>
-" Last Modified: 22 Apr 2011.
 " License: MIT license  {{{
 "     Permission is hereby granted, free of charge, to any person obtaining
 "     a copy of this software and associated documentation files (the
@@ -27,7 +26,7 @@
 let s:save_cpo = &cpo
 set cpo&vim
 
-function! unite#filters#sorter_nothing#define() "{{{
+function! unite#filters#sorter_nothing#define() abort "{{{
   return s:sorter
 endfunction"}}}
 
@@ -36,7 +35,7 @@ let s:sorter = {
       \ 'description' : 'nothing sorter',
       \}
 
-function! s:sorter.filter(candidates, context) "{{{
+function! s:sorter.filter(candidates, context) abort "{{{
   " Nothing.
   return a:candidates
 endfunction"}}}

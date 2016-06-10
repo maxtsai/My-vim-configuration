@@ -1,7 +1,6 @@
 "=============================================================================
 " FILE: buffer.vim
 " AUTHOR:  Shougo Matsushita <Shougo.Matsu@gmail.com>
-" Last Modified: 06 Aug 2010
 " License: MIT license  {{{
 "     Permission is hereby granted, free of charge, to any person obtaining
 "     a copy of this software and associated documentation files (the
@@ -25,7 +24,6 @@
 "=============================================================================
 
 if exists('g:loaded_unite_source_buffer')
-      \ || $SUDO_USER != ''
   finish
 endif
 
@@ -34,10 +32,21 @@ set cpo&vim
 
 augroup plugin-unite-source-buffer
   autocmd!
-  autocmd BufEnter,BufWinEnter,BufFilePost * call unite#sources#buffer#_append()
+  autocmd BufEnter,BufWinEnter,BufFilePost *
+        \ call s:append(expand('<amatch>'))
 augroup END
 
 let g:loaded_unite_source_buffer = 1
+
+function! s:append(path) abort "{{{
+  if bufnr('%') != expand('<abuf>')
+    return
+  endif
+
+  if !has('vim_starting') || bufname(bufnr('%')) != ''
+    call unite#sources#buffer#variables#append(bufnr('%'))
+  endif
+endfunction"}}}
 
 let &cpo = s:save_cpo
 unlet s:save_cpo

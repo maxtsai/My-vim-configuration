@@ -1,7 +1,6 @@
 "=============================================================================
 " FILE: changes.vim
 " AUTHOR:  Shougo Matsushita <Shougo.Matsu@gmail.com>
-" Last Modified: 16 Mar 2012.
 " License: MIT license  {{{
 "     Permission is hereby granted, free of charge, to any person obtaining
 "     a copy of this software and associated documentation files (the
@@ -30,7 +29,7 @@ set cpo&vim
 " Variables  "{{{
 "}}}
 
-function! unite#sources#change#define() "{{{
+function! unite#sources#change#define() abort "{{{
   return s:source
 endfunction"}}}
 
@@ -41,14 +40,13 @@ let s:source = {
       \ }
 
 let s:cached_result = []
-function! s:source.hooks.on_init(args, context) "{{{
+function! s:source.hooks.on_init(args, context) abort "{{{
   " Get changes list.
   redir => redir
   silent! changes
   redir END
 
   let result = []
-  let max_width = (winwidth(0) - 5)
   for change in split(redir, '\n')[1:]
     let list = split(change)
     if len(list) < 4
@@ -70,7 +68,7 @@ function! s:source.hooks.on_init(args, context) "{{{
 
   let a:context.source__result = reverse(result)
 endfunction"}}}
-function! s:source.gather_candidates(args, context) "{{{
+function! s:source.gather_candidates(args, context) abort "{{{
   return a:context.source__result
 endfunction"}}}
 

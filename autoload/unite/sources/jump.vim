@@ -1,7 +1,6 @@
 "=============================================================================
 " FILE: jump.vim
 " AUTHOR:  Shougo Matsushita <Shougo.Matsu@gmail.com>
-" Last Modified: 02 Oct 2012.
 " License: MIT license  {{{
 "     Permission is hereby granted, free of charge, to any person obtaining
 "     a copy of this software and associated documentation files (the
@@ -30,7 +29,7 @@ set cpo&vim
 " Variables  "{{{
 "}}}
 
-function! unite#sources#jump#define() "{{{
+function! unite#sources#jump#define() abort "{{{
   return s:source
 endfunction"}}}
 
@@ -41,7 +40,7 @@ let s:source = {
       \ }
 
 let s:cached_result = []
-function! s:source.gather_candidates(args, context) "{{{
+function! s:source.gather_candidates(args, context) abort "{{{
   " Get jumps list.
   redir => redir
   silent! jumps

@@ -1,7 +1,6 @@
 "=============================================================================
 " FILE: converter_tail.vim
 " AUTHOR:  Shougo Matsushita <Shougo.Matsu@gmail.com>
-" Last Modified: 10 May 2013.
 " License: MIT license  {{{
 "     Permission is hereby granted, free of charge, to any person obtaining
 "     a copy of this software and associated documentation files (the
@@ -27,7 +26,7 @@
 let s:save_cpo = &cpo
 set cpo&vim
 
-function! unite#filters#converter_tail#define() "{{{
+function! unite#filters#converter_tail#define() abort "{{{
   return s:converter
 endfunction"}}}
 
@@ -36,7 +35,7 @@ let s:converter = {
       \ 'description' : 'converts word to tail of filename',
       \}
 
-function! s:converter.filter(candidates, context) "{{{
+function! s:converter.filter(candidates, context) abort "{{{
   for candidate in a:candidates
     if !has_key(candidate, 'abbr')
       " Save original word.

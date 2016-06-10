@@ -1,7 +1,6 @@
 "=============================================================================
 " FILE: process.vim
 " AUTHOR:  Shougo Matsushita <Shougo.Matsu@gmail.com>
-" Last Modified: 23 Feb 2013.
 " License: MIT license  {{{
 "     Permission is hereby granted, free of charge, to any person obtaining
 "     a copy of this software and associated documentation files (the
@@ -32,7 +31,7 @@ call unite#util#set_default(
       \ 'g:unite_source_process_enable_confirm', 1)
 "}}}
 
-function! unite#sources#process#define() "{{{
+function! unite#sources#process#define() abort "{{{
   return executable('ps') || (unite#util#is_windows() && executable('tasklist')) ?
         \ s:source : {}
 endfunction"}}}
@@ -45,7 +44,7 @@ let s:source = {
       \ 'alias_table' : { 'delete' : 'sigkill' },
       \ }
 
-function! s:source.gather_candidates(args, context) "{{{
+function! s:source.gather_candidates(args, context) abort "{{{
   " Get process list.
   let _ = []
 
@@ -63,7 +62,10 @@ function! s:source.gather_candidates(args, context) "{{{
     let [message_linenr, start_result, min_len] = [0, 1, 2]
   endif
 
-  call unite#print_source_message(result[message_linenr], s:source.name)
+  call unite#print_source_message(
+        \ result[message_linenr], s:source.name)
+  call add(_, { 'word' : result[message_linenr], 'is_dummy' : 1})
+
   for line in result[start_result :]
     let process = split(line)
     if len(process) < min_len
@@ -74,8 +76,7 @@ function! s:source.gather_candidates(args, context) "{{{
     call add(_, {
           \ 'word' : (unite#util#is_windows() ?
           \           process[0] : join(process[10:])),
-          \ 'abbr' : repeat(' ', len(
-          \       unite#_convert_source_name(s:source.name))+1) . line,
+          \ 'abbr' : line,
           \ 'action__pid' : process[1],
           \})
   endfor
@@ -90,7 +91,7 @@ let s:source.action_table.sigkill = {
       \ 'is_quit' : 0,
       \ 'is_selectable' : 1,
       \ }
-function! s:source.action_table.sigkill.func(candidates) "{{{
+function! s:source.action_table.sigkill.func(candidates) abort "{{{
   call s:kill('KILL', a:candidates)
 endfunction"}}}
 
@@ -100,7 +101,7 @@ let s:source.action_table.sigterm = {
       \ 'is_quit' : 0,
       \ 'is_selectable' : 1,
       \ }
-function! s:source.action_table.sigterm.func(candidates) "{{{
+function! s:source.action_table.sigterm.func(candidates) abort "{{{
   call s:kill('TERM', a:candidates)
 endfunction"}}}
 
@@ -110,7 +111,7 @@ let s:source.action_table.sigint = {
       \ 'is_quit' : 0,
       \ 'is_selectable' : 1,
       \ }
-function! s:source.action_table.sigint.func(candidates) "{{{
+function! s:source.action_table.sigint.func(candidates) abort "{{{
   call s:kill('INT', a:candidates)
 endfunction"}}}
 
@@ -119,7 +120,7 @@ let s:source.action_table.unite__new_candidate = {
       \ 'is_invalidate_cache' : 1,
       \ 'is_quit' : 0,
       \ }
-function! s:source.action_table.unite__new_candidate.func(candidate) "{{{
+function! s:source.action_table.unite__new_candidate.func(candidate) abort "{{{
   let cmdline = unite#util#input(
         \ 'Please input command args : ', '', 'shellcmd')
 
@@ -130,16 +131,13 @@ function! s:source.action_table.unite__new_candidate.func(candidate) "{{{
   endif
 endfunction"}}}
 
-function! s:kill(signal, candidates) "{{{
+function! s:kill(signal, candidates) abort "{{{
   if g:unite_source_process_enable_confirm
     if !unite#util#input_yesno(
           \ 'Really send the ' . a:signal .' signal to the processes?')
-      redraw
       echo 'Canceled.'
       return
     endif
-
-    redraw
   endif
 
   for candidate in a:candidates
