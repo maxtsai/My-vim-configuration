@@ -119,6 +119,9 @@ map <F8> <ESC>:Tlist<ENTER>
 map <F9> :BufExplorer <CR>
 map <F12> :qa <CR>
 
+nnoremap <C-f> :Unite -start-insert file<CR>
+nnoremap <C-b> :Unite buffer<CR>
+
 " print debug comment
 let @d="printk(\"### \%s:\%d\\n\", __func__, __LINE__);"
 
@@ -126,9 +129,9 @@ let @d="printk(\"### \%s:\%d\\n\", __func__, __LINE__);"
 let MRU_Max_Entries = 200
 
 "ctrlp, fuzzy search file
-let g:ctrlp_max_files=0
-let g:ctrlp_custom_ignore='.git$|.repo$'
-let g:ctrlp_max_depth=40
+"let g:ctrlp_max_files=0
+"let g:ctrlp_custom_ignore='.git$|.repo$'
+"let g:ctrlp_max_depth=40
 
 "let Tlist_Inc_Winwidth=0
 let Tlist_Ctags_Cmd="/usr/bin/ctags"
