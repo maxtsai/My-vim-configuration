@@ -109,14 +109,15 @@ map ,r :MRU <CR>
 
 map <F2> :r ~/.vim/max/debug_printk.txt<CR>
 map <F3> :r ~/.vim/max/debug_printf.txt<CR>
-map <F5> :lv /<c-r>=expand("<cword>")<cr>/ **/* <cr>:lw <CR>
+"map <F5> :lv /<c-r>=expand("<cword>")<cr>/ **/* <cr>:lw <CR>
 "map <F6> :SaveSession <CR>
-map <F6> :cd %:h <CR>
-map <F4> :syntax off <CR>
-map <F11> :VimwikiAll2HTML <CR>
+"map <F6> :cd %:h <CR>
+"map <F4> :syntax off <CR>
+map <F5> :NERDTree <CR>
 map <F7> <ESC>:TagbarToggle<ENTER>
 map <F8> <ESC>:Tlist<ENTER>
 map <F9> :BufExplorer <CR>
+map <F6> :VimwikiAll2HTML <CR>
 map <F12> :qa <CR>
 
 " print debug comment
