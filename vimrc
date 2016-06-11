@@ -158,7 +158,8 @@ autocmd BufEnter * :syntax sync fromstart " ensure every file does syntax highli
 " Statusline
 """"""""""""""""""""""""""""""
 " Always hide the statusline
-set laststatus=0
+set laststatus=1
+let g:Powerline_symbols = 'fancy'
 
 
 """"""""""""""""""""""""""""""
