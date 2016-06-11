@@ -192,7 +192,7 @@ set nocompatible
 " keep cscope result in quickfix
 """"""""""""""""""""""""""""""
 set cscopequickfix=c-,d-,e-,g-,i-,s-,t-
-set cscopeverbose
+"set cscopeverbose
 "nmap <C-n> :cnext<CR>
 "nmap <C-p> :cprev<CR>
 "nmap <C-t> :colder<CR>:cc<CR>
