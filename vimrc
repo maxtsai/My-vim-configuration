@@ -164,6 +164,7 @@ let g:Powerline_symbols = 'fancy'
 
 "" dislabe session autoload
 let g:session_autoload = 'no'
+let g:session_autosave = 'no'
 
 """"""""""""""""""""""""""""""
 " BufExplorer
