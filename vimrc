@@ -158,9 +158,12 @@ autocmd BufEnter * :syntax sync fromstart " ensure every file does syntax highli
 " Statusline
 """"""""""""""""""""""""""""""
 " Always hide the statusline
-set laststatus=1
+set laststatus=2
 let g:Powerline_symbols = 'fancy'
 
+
+"" dislabe session autoload
+let g:session_autoload = 'no'
 
 """"""""""""""""""""""""""""""
 " BufExplorer
