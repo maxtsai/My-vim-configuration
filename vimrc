@@ -173,18 +173,6 @@ let g:bufExplorerSplitVertSize = 30  " Split width
 let g:bufExplorerUseCurrentWindow=1  " Open in new window.
 autocmd BufWinEnter \[Buf\ List\] setl nonumber
 
-""""""""""""""""""""""""""""""
-" Delete trailing white space
-""""""""""""""""""""""""""""""
-func! DeleteTrailingWS()
-  exe "normal mz"
-  %s/\s\+$//ge
-  exe "normal `z"
-endfunc
-"autocmd BufWrite *.[ch] :call DeleteTrailingWS()
-"autocmd BufWrite *.cpp :call DeleteTrailingWS()
-"autocmd BufWrite *.java :call DeleteTrailingWS()
-
 
 """"""""""""""""""""""""""""""
 " Vimwiki
@@ -203,7 +191,8 @@ set nocompatible
 """"""""""""""""""""""""""""""
 " keep cscope result in quickfix
 """"""""""""""""""""""""""""""
-"set cscopequickfix=c-,d-,e-,g-,i-,s-,t-
+set cscopequickfix=c-,d-,e-,g-,i-,s-,t-
+set cscopeverbose
 "nmap <C-n> :cnext<CR>
 "nmap <C-p> :cprev<CR>
 "nmap <C-t> :colder<CR>:cc<CR>
@@ -219,7 +208,7 @@ run macros/gdb_mappings.vim
 
 """""""""""""""""""""""""""""
 "nmap ,e :tab sp <C-R>=expand("%:h") . "/" <CR>
-nmap ,e :tab sp 
+nmap ,e :tab sp
 
 "speed up when syntax on
 set ttyfast
