@@ -35,11 +35,11 @@ endif
 " according to the detected filetype.
 if has("autocmd")
   filetype plugin indent on
+  autocmd FileType make set tabstop=8 shiftwidth=8 softtabstop=0 noexpandtab
+  autocmd FileType java set tabstop=4 shiftwidth=4 softtabstop=0 expandtab
+  autocmd FileType cpp set tabstop=4 shiftwidth=4 softtabstop=0 expandtab
+  autocmd FileType aidl set tabstop=4 shiftwidth=4 softtabstop=0 expandtab
 endif
-
-" The following are commented out as they cause vim to behave a lot
-" differently from regular Vi. They are highly recommended though.
-"set shiftwidth=4
 set showcmd		" Show (partial) command in status line.
 set showmatch		" Show matching brackets.
 set ignorecase		" Do case insensitive matching
@@ -83,11 +83,6 @@ hi clear
 
 set t_Co=256 " 256 colors
 colorscheme ir_black
-
-"filetype on
-"au FileType java setl sw=4 sts=4 et
-"au FileType cpp setl sw=4 sts=4 et
-"au FileType aidl setl sw=4 sts=4 et
 
 set fenc=utf-8
 set fencs=utf-8,usc-bom,euc-jp,gb18030,gbk,gb2312,cp936
