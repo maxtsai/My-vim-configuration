@@ -210,8 +210,11 @@ run macros/gdb_mappings.vim
 "nmap ,e :tab sp <C-R>=expand("%:h") . "/" <CR>
 nmap ,e :tab sp
 
-"speed up when syntax on
+"" speed up when syntax on
 set ttyfast
 set lazyredraw
+
+"" shell command output to quickfix
+command -nargs=+ Run :cexpr system('<args>') | copen
 
 finish
