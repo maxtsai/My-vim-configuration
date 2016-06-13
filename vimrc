@@ -35,11 +35,11 @@ endif
 " according to the detected filetype.
 if has("autocmd")
   filetype plugin indent on
+  autocmd FileType make set tabstop=8 shiftwidth=8 softtabstop=0 noexpandtab
+  autocmd FileType java set tabstop=4 shiftwidth=4 softtabstop=0 expandtab
+  autocmd FileType cpp set tabstop=4 shiftwidth=4 softtabstop=0 expandtab
+  autocmd FileType aidl set tabstop=4 shiftwidth=4 softtabstop=0 expandtab
 endif
-
-" The following are commented out as they cause vim to behave a lot
-" differently from regular Vi. They are highly recommended though.
-"set shiftwidth=4
 set showcmd		" Show (partial) command in status line.
 set showmatch		" Show matching brackets.
 set ignorecase		" Do case insensitive matching
@@ -84,11 +84,6 @@ hi clear
 set t_Co=256 " 256 colors
 colorscheme ir_black
 
-"filetype on
-"au FileType java setl sw=4 sts=4 et
-"au FileType cpp setl sw=4 sts=4 et
-"au FileType aidl setl sw=4 sts=4 et
-
 set fenc=utf-8
 set fencs=utf-8,usc-bom,euc-jp,gb18030,gbk,gb2312,cp936
 if version >= 603
@@ -107,28 +102,24 @@ map ,n :set nu!<CR>
 map ,s :set cursorline!<CR>:set cursorcolumn!<CR>
 map ,r :MRU <CR>
 
-map <F2> :r ~/.vim/max/debug_printk.txt<CR>
-map <F3> :r ~/.vim/max/debug_printf.txt<CR>
-map <F5> :lv /<c-r>=expand("<cword>")<cr>/ **/* <cr>:lw <CR>
+"map <F5> :lv /<c-r>=expand("<cword>")<cr>/ **/* <cr>:lw <CR>
 "map <F6> :SaveSession <CR>
-map <F6> :cd %:h <CR>
-map <F4> :syntax off <CR>
-map <F11> :VimwikiAll2HTML <CR>
+"map <F6> :cd %:h <CR>
+"map <F4> :syntax off <CR>
+map <F5> :NERDTree <CR>
+
 map <F7> <ESC>:TagbarToggle<ENTER>
 map <F8> <ESC>:Tlist<ENTER>
 map <F9> :BufExplorer <CR>
 map <F12> :qa <CR>
 
-" print debug comment
-let @d="printk(\"### \%s:\%d\\n\", __func__, __LINE__);"
+" print debug 
+let @1="printk(\"+++ \%s:\%d\\n\", __func__, __LINE__);"
+let @2="printf(\"+++ \%s:\%d\\n\", __FUNCTION__, __LINE__);"
 
 "Most recently used
 let MRU_Max_Entries = 200
 
-"ctrlp, fuzzy search file
-let g:ctrlp_max_files=0
-let g:ctrlp_custom_ignore='.git$|.repo$'
-let g:ctrlp_max_depth=40
 
 "let Tlist_Inc_Winwidth=0
 let Tlist_Ctags_Cmd="/usr/bin/ctags"
@@ -143,7 +134,9 @@ let Tlist_Enable_Fold_Column = 1 " Do not show folding tree
 let Tlist_Show_One_File = 1 "不同时显示多个文件的tag，只显示当前文件的
 let Tlist_Exit_OnlyWindow = 1
 
+if has("autocmd")
 autocmd BufEnter * :syntax sync fromstart " ensure every file does syntax highlighting (full)
+endif
 
 
 """"""""""""""""""""""""""""""
@@ -157,8 +150,13 @@ autocmd BufEnter * :syntax sync fromstart " ensure every file does syntax highli
 " Statusline
 """"""""""""""""""""""""""""""
 " Always hide the statusline
-set laststatus=0
+set laststatus=2
+let g:Powerline_symbols = 'fancy'
 
+
+"" dislabe session autoload
+let g:session_autoload = 'no'
+let g:session_autosave = 'no'
 
 """"""""""""""""""""""""""""""
 " BufExplorer
@@ -170,39 +168,16 @@ let g:bufExplorerSplitRight=0        " Split left.
 let g:bufExplorerSplitVertical=1     " Split vertically.
 let g:bufExplorerSplitVertSize = 30  " Split width
 let g:bufExplorerUseCurrentWindow=1  " Open in new window.
+if has("autocmd")
 autocmd BufWinEnter \[Buf\ List\] setl nonumber
-
-""""""""""""""""""""""""""""""
-" Delete trailing white space
-""""""""""""""""""""""""""""""
-func! DeleteTrailingWS()
-  exe "normal mz"
-  %s/\s\+$//ge
-  exe "normal `z"
-endfunc
-"autocmd BufWrite *.[ch] :call DeleteTrailingWS()
-"autocmd BufWrite *.cpp :call DeleteTrailingWS()
-"autocmd BufWrite *.java :call DeleteTrailingWS()
-
-
-""""""""""""""""""""""""""""""
-" Vimwiki
-""""""""""""""""""""""""""""""
-"let g:vimwiki_folding = 1
-let g:vimwiki_valid_html_tags='b,i,s,u,sub,sup,kbd,br,hr,div,del,code,pre'
-let g:vimwiki_camel_case=0
-let g:vimwiki_hl_cb_checked=1
-let g:vimwiki_CJK_length=1
-let g:vimwiki_list = [{'path': '~/vimwiki/', 'path_html': '~/Documents/myWiki'}]
-" make local commands work (for ex., Vimwiki2HTML)
-set nocompatible
-"filetype plugin on
+endif
 
 
 """"""""""""""""""""""""""""""
 " keep cscope result in quickfix
 """"""""""""""""""""""""""""""
-"set cscopequickfix=c-,d-,e-,g-,i-,s-,t-
+set cscopequickfix=c-,d-,e-,g-,i-,s-,t-
+"set cscopeverbose
 "nmap <C-n> :cnext<CR>
 "nmap <C-p> :cprev<CR>
 "nmap <C-t> :colder<CR>:cc<CR>
@@ -218,10 +193,18 @@ run macros/gdb_mappings.vim
 
 """""""""""""""""""""""""""""
 "nmap ,e :tab sp <C-R>=expand("%:h") . "/" <CR>
-nmap ,e :tab sp 
+nmap ,e :tab sp
 
-"speed up when syntax on
+"" speed up when syntax on
 set ttyfast
 set lazyredraw
+
+"" shell command output to quickfix
+command -nargs=+ Run :cexpr system('<args>') | copen
+
+if has("autocmd")
+"" preview markdown file in chrome. Need chrome with markdown extension
+autocmd BufRead,BufNewFile *.{md,mdown,mkd,mkdn,markdown,mdwn} map <Leader>p :!google-chrome-stable %:p &>/dev/null &<CR>
+endif
 
 finish
