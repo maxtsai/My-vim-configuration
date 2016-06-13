@@ -152,6 +152,7 @@ endif
 " Always hide the statusline
 set laststatus=2
 let g:Powerline_symbols = 'fancy'
+let Powerline_symbols='compatible'
 
 
 "" dislabe session autoload
