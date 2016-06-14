@@ -116,6 +116,7 @@ map <F12> :qa <CR>
 " print debug 
 let @1="printk(\"+++ \%s:\%d\\n\", __func__, __LINE__);"
 let @2="printf(\"+++ \%s:\%d\\n\", __FUNCTION__, __LINE__);"
+let @3=strftime("// Max Tsai: %d/%m/%y %H:%M:%S")
 
 "Most recently used
 let MRU_Max_Entries = 200
