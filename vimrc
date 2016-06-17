@@ -50,6 +50,7 @@ set hls
 set nocompatible
 set number
 set hlsearch
+set backspace=indent,eol,start
 "set mouse=a
 
 "folding
