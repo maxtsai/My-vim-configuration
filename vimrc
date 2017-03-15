@@ -83,7 +83,7 @@ set modelines=2
 hi clear
 
 set t_Co=256 " 256 colors
-colorscheme ir_black
+colorscheme 256-jungle
 
 set fenc=utf-8
 set fencs=utf-8,usc-bom,euc-jp,gb18030,gbk,gb2312,cp936
