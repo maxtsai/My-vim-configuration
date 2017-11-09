@@ -23,7 +23,7 @@ endif
 
 " If using a dark background within the editing area and syntax highlighting
 " turn on this option as well
-"set background=dark
+set background=dark
 
 " Uncomment the following to have Vim jump to the last position when
 " reopening a file
@@ -83,7 +83,12 @@ set modelines=2
 hi clear
 
 set t_Co=256 " 256 colors
-colorscheme 256-jungle
+"colorscheme 256-jungle
+colorscheme tender
+"colorscheme vividchalk
+"colorscheme ir_black
+"colorscheme mayansmoke
+
 
 set fenc=utf-8
 set fencs=utf-8,usc-bom,euc-jp,gb18030,gbk,gb2312,cp936
