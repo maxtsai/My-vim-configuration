@@ -88,7 +88,11 @@ colorscheme tender
 "colorscheme vividchalk
 "colorscheme ir_black
 "colorscheme mayansmoke
+"hi Normal ctermbg=17
 
+"highlight Search term=reverse ctermbg=4 ctermfg=7
+"highlight Normal ctermbg=black ctermfg=green
+"hi Comment ctermfg=darkcyan
 
 set fenc=utf-8
 set fencs=utf-8,usc-bom,euc-jp,gb18030,gbk,gb2312,cp936
@@ -97,10 +101,6 @@ if version >= 603
 	set encoding=utf-8
 endif
 
-
-highlight Search term=reverse ctermbg=4 ctermfg=7
-"highlight Normal ctermbg=black ctermfg=green
-hi Comment ctermfg=darkcyan
 
 map ,h :nohl<CR>
 map ,w :set wrap!<CR>
