@@ -83,13 +83,29 @@ set modelines=2
 hi clear
 
 set t_Co=256 " 256 colors
+
 "colorscheme 256-jungle
-colorscheme tender
+"colorscheme tender
 "colorscheme vividchalk
 "colorscheme ir_black
 "colorscheme mayansmoke
-"hi Normal ctermbg=17
+"colorscheme gruvbox
+"colorscheme codedark
+"colorscheme solarized
+"colorscheme corporation
+colorscheme ir_black
 
+
+""""""""""""""""""""""""""""""""""""""
+let g:kolor_italic=1
+let g:kolor_bold=1
+let g:kolor_underlined=0
+let g:kolor_alternative_matchparen=0
+let g:kolor_inverted_matchparen=0
+"colorscheme kcolor
+""""""""""""""""""""""""""""""""""""""
+
+"hi Normal ctermbg=17
 "highlight Search term=reverse ctermbg=4 ctermfg=7
 "highlight Normal ctermbg=black ctermfg=green
 "hi Comment ctermfg=darkcyan
@@ -216,3 +232,9 @@ autocmd BufRead,BufNewFile *.{md,mdown,mkd,mkdn,markdown,mdwn} map <Leader>p :!g
 endif
 
 finish
+
+alias icdiff='icdiff --highlight'
+
+
+"" for the fix for No syntax highlighting in tmux
+set termguicolors
