@@ -93,7 +93,7 @@ set t_Co=256 " 256 colors
 "colorscheme codedark
 "colorscheme solarized
 "colorscheme corporation
-colorscheme ir_black
+colorscheme mine
 
 
 """"""""""""""""""""""""""""""""""""""
@@ -235,6 +235,3 @@ finish
 
 alias icdiff='icdiff --highlight'
 
-
-"" for the fix for No syntax highlighting in tmux
-set termguicolors
