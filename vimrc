@@ -86,14 +86,14 @@ set t_Co=256 " 256 colors
 
 "colorscheme 256-jungle
 "colorscheme tender
-"colorscheme vividchalk
+colorscheme vividchalk
 "colorscheme ir_black
 "colorscheme mayansmoke
 "colorscheme gruvbox
 "colorscheme codedark
 "colorscheme solarized
 "colorscheme corporation
-colorscheme mine
+"colorscheme mine
 
 
 """"""""""""""""""""""""""""""""""""""
