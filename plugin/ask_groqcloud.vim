@@ -3,7 +3,7 @@ function! AskGrokFunc(start, end)
   let l:prompt = join(l:lines, "\n")
 
   " Call the new script
-  let l:output = system("python3 ~/.vim/grokcloud_send.py", l:prompt)
+  let l:output = system("python3 ~/.vim/groqcloud_send.py", l:prompt)
 
   " Show output
   new
