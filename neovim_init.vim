@@ -14,12 +14,20 @@ set rtp+=~/.fzf
 
 " --- FZF command wrappers (lowercase) ---
 
-command! -nargs=0 Vupdate call s:UpdateFzfIndex()
-function! s:UpdateFzfIndex()
-  let l:cmd = expand('~/bin/update_fzf_index.sh')
+command! -nargs=* Vupdate call s:UpdateFzfIndex(<f-args>)
+function! s:UpdateFzfIndex(...) abort
+  let l:args = a:000
+  let l:cmd = shellescape(expand('~/bin/update_fzf_index.sh'))
+
+  if len(l:args) > 0
+    let l:escaped_args = map(copy(l:args), 'shellescape(v:val)')
+    let l:cmd .= ' ' . join(l:escaped_args, ' ')
+  endif
+
   let l:output = system(l:cmd)
   echo l:output
 endfunction
+
 
 command! -nargs=? Vf call <SID>VF(<f-args>)
 
@@ -77,7 +85,7 @@ command! -nargs=0 Vhelp call s:ShowFzfHelp()
 function! s:ShowFzfHelp() abort
   echo "🎯 FZF Command Reference (Neovim)"
   echo ""
-  echo "  :Vupdate      → Refresh the file index (skips .git/build/tmp)"
+  echo "  :Vupdate [-f] → Refresh the file index (skips .git/build/tmp)"
   echo "  :Vf [term]    → Fuzzy-pick a file from index and open in vi"
   echo "  :Vfind        → Alias for :Vf"
   echo "  :Vseek <term> → Fuzzy-search text via ripgrep and jump to line"
@@ -93,4 +101,31 @@ function! s:ShowFzfHelp() abort
   echo "  - Use :Vupdate after switching projects"
 endfunction
 
+
+
+
+
+
+"""""""""""" LLM CLI
+lua << EOF
+function AskGroqRightTerminal()
+  vim.ui.input({ prompt = "Ask Groq: " }, function(input)
+    if input == nil or input == '' then return end
+
+    -- Sanitize user input for shell
+    input = input:gsub("'", "'\\''")
+
+    -- Construct the shell command
+    local cmd = "echo '" .. input .. "' | python3 ~/.vim/groqcloud_send.py"
+
+    -- Open vertical split on the right and run terminal with command
+    vim.cmd("vsplit")                    -- open right vertical window
+    vim.cmd("terminal " .. cmd)         -- run your LLM script inside it
+    vim.cmd("startinsert")              -- auto enter insert mode in terminal
+  end)
+end
+
+-- Map it to <leader>g (change this if your leader is space or comma)
+vim.api.nvim_set_keymap('n', '<leader>g', ':lua AskGroqRightTerminal()<CR>', { noremap = true, silent = true })
+EOF
 
