@@ -16,11 +16,9 @@ set rtp+=~/.fzf
 
 command! -nargs=0 Vupdate call s:UpdateFzfIndex()
 function! s:UpdateFzfIndex()
-  let l:ignore = ['-path', '*/.git/*', '-o', '-path', '*/build/*', '-o', '-path', '*/tmp/*', '-o', '-path', '*/out/*']
-  let l:cmd = ['find', '.', '(',] + l:ignore + [')', '-prune', '-o', '-type', 'f', '-print']
-  let l:output = system(join(l:cmd, ' '))
-  call writefile(split(l:output, "\n"), expand("~/.fzf-index-files"))
-  echo "[✔] Indexed " . len(split(l:output, "\n")) . " files"
+  let l:cmd = expand('~/bin/update_fzf_index.sh')
+  let l:output = system(l:cmd)
+  echo l:output
 endfunction
 
 command! -nargs=? Vf call <SID>VF(<f-args>)
