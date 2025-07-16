@@ -16,6 +16,6 @@ genai.configure(api_key=api_key)
 user_input = sys.stdin.read().strip()
 prompt = "請用台灣常用的繁體中文回答以下問題：\n" + user_input
 
-model = genai.GenerativeModel('gemini-2.5-pro')
+model = genai.GenerativeModel('gemini-2.5-flash')
 response = model.generate_content(prompt)
 print(response.text)

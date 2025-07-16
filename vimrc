@@ -118,7 +118,7 @@ if version >= 603
 endif
 
 
-map ,h :nohl<CR>
+map ,h :History<CR>
 map ,w :set wrap!<CR>
 map ,n :set nu!<CR>
 map ,s :set cursorline!<CR>:set cursorcolumn!<CR>
@@ -218,6 +218,9 @@ run macros/gdb_mappings.vim
 """""""""""""""""""""""""""""
 "nmap ,e :tab sp <C-R>=expand("%:h") . "/" <CR>
 nmap ,e :tab sp
+
+" Use Ctrl+q for Visual Block mode
+noremap <C-q> <C-v>
 
 "" speed up when syntax on
 set ttyfast
