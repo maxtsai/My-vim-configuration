@@ -31,11 +31,29 @@ endfunction
 
 command! -nargs=? Vf call <SID>VF(<f-args>)
 
+function! s:FindNearestFzfIndex()
+  let l:dir = getcwd()
+  let l:home = expand('$HOME')
+  while l:dir !=# l:home && l:dir !=# '/'
+    let l:index = l:dir . '/.fzf-index-files'
+    if filereadable(l:index)
+      return l:index
+    endif
+    let l:dir = fnamemodify(l:dir, ':h')
+  endwhile
+  return l:home . '/.fzf-index-files'
+endfunction
+
 function! s:VF(...) abort
   let l:search = get(a:000, 0, '')
-  let l:files = readfile(expand('~/.fzf-index-files'))
+  let l:index_file = s:FindNearestFzfIndex()
+  if !filereadable(l:index_file)
+    echohl WarningMsg | echom "❌ No .fzf-index-files found." | echohl None
+    return
+  endif
+  let l:files = readfile(l:index_file)
   if !empty(l:search)
-    let l:files = filter(l:files, 'v:val =~? l:search')
+    let l:files = filter(copy(l:files), 'v:val =~? l:search')
   endif
   call fzf#run(fzf#wrap({ 'source': l:files, 'sink': 'edit' }))
 endfunction
@@ -43,12 +61,20 @@ endfunction
 command! -nargs=1 Vseek call fzf#run(fzf#wrap({
       \ 'source': 'rg --line-number --no-heading --color=always '.shellescape(<q-args>),
       \ 'sink':   function('s:RipgrepSink'),
-      \ 'options': '--ansi --preview "bat --style=numbers --color=always {1} --line-range {2}:" --delimiter ":" --nth 3..'
+      \ 'options': '--ansi --delimiter ":" --nth 3.. --preview "bat --style=numbers --color=always {1} --line-range {2}: 2>/dev/null || cat {1}"'
       \ }))
 function! s:RipgrepSink(line)
   let l:parts = split(a:line, ':')
   if len(l:parts) >= 2
-    exec 'edit +' . l:parts[1] . ' ' . l:parts[0]
+    let l:file = trim(l:parts[0])
+    let l:line_number = trim(l:parts[1])
+    if filereadable(l:file)
+      execute 'edit +' . l:line_number . ' ' . fnameescape(l:file)
+    else
+      echohl ErrorMsg | echom "❌ File not found: " . l:file | echohl None
+    endif
+  else
+    echohl WarningMsg | echom "⚠️ Unexpected format: " . a:line | echohl None
   endif
 endfunction
 

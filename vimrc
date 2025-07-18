@@ -118,11 +118,11 @@ if version >= 603
 endif
 
 
-map ,h :History<CR>
+map ,r :History<CR>
 map ,w :set wrap!<CR>
 map ,n :set nu!<CR>
 map ,s :set cursorline!<CR>:set cursorcolumn!<CR>
-map ,r :MRU <CR>
+map ,h :MRU <CR>
 
 "map <F5> :lv /<c-r>=expand("<cword>")<cr>/ **/* <cr>:lw <CR>
 "map <F6> :SaveSession <CR>
