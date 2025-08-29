@@ -33,13 +33,13 @@ endif
 
 " Uncomment the following to have Vim load indentation rules and plugins
 " according to the detected filetype.
-if has("autocmd")
-  filetype plugin indent on
-  autocmd FileType make set tabstop=8 shiftwidth=8 softtabstop=0 noexpandtab
-  autocmd FileType java set tabstop=4 shiftwidth=4 softtabstop=0 expandtab
-  autocmd FileType cpp set tabstop=4 shiftwidth=4 softtabstop=0 expandtab
-  autocmd FileType aidl set tabstop=4 shiftwidth=4 softtabstop=0 expandtab
-endif
+"if has("autocmd")
+"  filetype plugin indent on
+"  autocmd FileType make set tabstop=8 shiftwidth=8 softtabstop=0 noexpandtab
+"  autocmd FileType java set tabstop=4 shiftwidth=4 softtabstop=0 expandtab
+"  autocmd FileType cpp set tabstop=4 shiftwidth=4 softtabstop=0 expandtab
+"  autocmd FileType aidl set tabstop=4 shiftwidth=4 softtabstop=0 expandtab
+"endif
 set showcmd		" Show (partial) command in status line.
 set showmatch		" Show matching brackets.
 set ignorecase		" Do case insensitive matching
@@ -71,14 +71,16 @@ set noswapfile
 set nobackup
 set bufhidden=hide "当buffer被丢弃的时候隐藏它
 set noerrorbells
+set list "show tab
 "set autochdir
 
 """"""""""""""""""""""""""""""""""""""
 " // vim: ts=4 sw=4 et in source code
 """"""""""""""""""""""""""""""""""""""
-set modeline
-set modelines=2
+"set modeline
+"set modelines=2
 
+set noexpandtab
 
 hi clear
 
